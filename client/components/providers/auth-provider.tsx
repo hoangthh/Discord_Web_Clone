@@ -1,8 +1,8 @@
 "use client";
 
+import { useAuth } from "@/hooks";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useAuth } from "../hooks";
 
 const PUBLIC_ROUTES = ["/login", "/register", "/forgot"];
 

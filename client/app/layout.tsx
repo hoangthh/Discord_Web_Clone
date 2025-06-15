@@ -1,4 +1,8 @@
-import { Providers, ThemeProvider } from "@/components/providers";
+import {
+  ModalProvider,
+  Providers,
+  ThemeProvider,
+} from "@/components/providers";
 import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
 import { Open_Sans } from "next/font/google";
@@ -34,6 +38,7 @@ export default async function RootLayout({
             enableSystem={false}
             storageKey="discord-clone-theme"
           >
+            <ModalProvider />
             {children}
           </ThemeProvider>
         </Providers>
