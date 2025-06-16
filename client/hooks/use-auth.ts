@@ -1,18 +1,17 @@
 "use client";
 
+import { Profile } from "@/models";
 import useSWR from "swr";
-import { PublicConfiguration } from "swr/_internal";
+import { SWRConfiguration } from "swr/_internal";
 
-export const useAuth = (options?: Partial<PublicConfiguration>) => {
+export const useAuth = (options?: Partial<SWRConfiguration<Profile>>) => {
   const {
     data: profile,
     error,
     isLoading,
-  } = useSWR(`/auth/profile`, {
-    dedupingInterval: 60 * 60 * 1000,
-    revalidateOnFocus: false,
+  } = useSWR<Profile>(`/api/auth/profile`, {
     ...options,
   });
-  console.log({ profile });
+
   return { profile, error, isLoading };
 };

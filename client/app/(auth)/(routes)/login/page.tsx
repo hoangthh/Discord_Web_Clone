@@ -12,7 +12,7 @@ import Image from "next/image";
 
 const LoginPage = () => {
   const handleLoginGoogle = () => {
-    window.location.href = `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/google`;
+    window.location.href = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/google`;
   };
 
   return (

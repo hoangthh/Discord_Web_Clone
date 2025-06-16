@@ -19,7 +19,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useServer } from "@/hooks";
+import { useServers } from "@/hooks";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -37,7 +37,7 @@ const formSchema = z.object({
 
 export const InitialModal = () => {
   const router = useRouter();
-  const { createServer } = useServer();
+  const { createServer } = useServers();
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {

@@ -19,7 +19,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useModal, useServer } from "@/hooks";
+import { useModal, useServers } from "@/hooks";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -36,7 +36,7 @@ const formSchema = z.object({
 
 export const CreateServerModal = () => {
   const { isOpen, onClose, type } = useModal();
-  const { createServer } = useServer();
+  const { createServer } = useServers();
   const router = useRouter();
 
   const isModalOpen = isOpen && type === "createServer";
