@@ -1,6 +1,7 @@
 "use client";
 
 import { useAuth } from "@/hooks";
+import { Loader2, LoaderCircle, LoaderCircleIcon } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -21,7 +22,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [isLoading, profile, router, isPublicRoute]);
 
-  if (isLoading || isRedirecting) return <div>Loading...</div>;
+  if (isLoading || isRedirecting)
+    return (
+      <div className="flex h-full w-full items-center justify-center">
+        <Loader2 className="all animate-spin transition" size={50} />
+      </div>
+    );
 
   return <>{children}</>;
 }
