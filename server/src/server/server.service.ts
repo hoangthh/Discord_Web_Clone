@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 export class ServerService {
   constructor(private prisma: PrismaService) {}
 
+  // GET: /api/servers
   async findAllServers(profileId: string) {
     const servers = await this.prisma.server.findMany({
       where: {
@@ -20,39 +21,7 @@ export class ServerService {
     return servers;
   }
 
-  async findServerByProfileId(profileId: string) {
-    const server = await this.prisma.server.findFirst({
-      where: {
-        members: {
-          some: {
-            profileId,
-          },
-        },
-      },
-    });
-    return server;
-  }
-
-  async findServerByServerIdIfMember({
-    serverId,
-    profileId,
-  }: {
-    serverId: string;
-    profileId: string;
-  }) {
-    const server = await this.prisma.server.findUnique({
-      where: {
-        id: serverId,
-        members: {
-          some: {
-            profileId: profileId,
-          },
-        },
-      },
-    });
-    return server;
-  }
-
+  // GET: /api/server/:serverId
   async findServerByServerId({ serverId }: { serverId: string }) {
     const server = await this.prisma.server.findUnique({
       where: {
@@ -77,6 +46,108 @@ export class ServerService {
     return server;
   }
 
+  // GET: /api/server/:serverId/if-member
+  async findServerByServerIdIfMember({
+    serverId,
+    profileId,
+  }: {
+    serverId: string;
+    profileId: string;
+  }) {
+    const server = await this.prisma.server.findUnique({
+      where: {
+        id: serverId,
+        members: {
+          some: {
+            profileId: profileId,
+          },
+        },
+      },
+    });
+    return server;
+  }
+
+  // GET: /api/server/profile/:profile-id
+  async findServerByProfileId(profileId: string) {
+    const server = await this.prisma.server.findFirst({
+      where: {
+        members: {
+          some: {
+            profileId,
+          },
+        },
+      },
+    });
+    return server;
+  }
+
+  // GET: /api/server/invite-code/:inviteCode/if-member
+  async findServerByInviteCodeIfMember({
+    inviteCode,
+    profileId,
+  }: {
+    inviteCode: string;
+    profileId: string;
+  }) {
+    const server = await this.prisma.server.findFirst({
+      where: {
+        inviteCode,
+        members: {
+          some: {
+            profileId: profileId,
+          },
+        },
+      },
+    });
+    return server;
+  }
+
+  // PATCH: /api/servers/invite-code
+  async changeInviteCode({
+    serverId,
+    profileId,
+  }: {
+    serverId: string;
+    profileId: string;
+  }) {
+    const server = await this.prisma.server.update({
+      where: {
+        id: serverId,
+        profileId,
+      },
+      data: {
+        inviteCode: uuidv4(),
+      },
+    });
+    return server;
+  }
+
+  // POST: /api/servers/:inviteCode/member
+  async addMemberToServer({
+    inviteCode,
+    profileId,
+  }: {
+    inviteCode: string;
+    profileId: string;
+  }) {
+    const server = await this.prisma.server.update({
+      where: {
+        inviteCode,
+      },
+      data: {
+        members: {
+          create: [
+            {
+              profileId,
+            },
+          ],
+        },
+      },
+    });
+    return server;
+  }
+
+  // POST: /api/servers
   async createServer({
     name,
     imageUrl,

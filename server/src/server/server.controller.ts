@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Param,
+  Patch,
   Post,
   Req,
   UploadedFile,
@@ -39,12 +40,14 @@ export class ServerController {
     return this.serverService.findAllServers(req.profile.profileId);
   }
 
-  @Get('profile/:profileId')
-  findServerByProfileId(@Param('profileId') profileId: string) {
-    return this.serverService.findServerByProfileId(profileId);
+  @Get(':serverId')
+  findServerByServerId(@Param('serverId') serverId: string) {
+    return this.serverService.findServerByServerId({
+      serverId,
+    });
   }
 
-  @Get('if-member/:serverId')
+  @Get(':serverId/if-member')
   findServerByServerIdIfMember(
     @Param('serverId') serverId: string,
     @Req() req: RequestWithProfileId,
@@ -55,10 +58,41 @@ export class ServerController {
     });
   }
 
-  @Get(':serverId')
-  findServerByServerId(@Param('serverId') serverId: string) {
-    return this.serverService.findServerByServerId({
+  @Get('profile/:profileId')
+  findServerByProfileId(@Param('profileId') profileId: string) {
+    return this.serverService.findServerByProfileId(profileId);
+  }
+
+  @Get('invite-code/:inviteCode/if-member')
+  findServerByInviteCodeIfMember(
+    @Param('inviteCode') inviteCode: string,
+    @Req() req: RequestWithProfileId,
+  ) {
+    return this.serverService.findServerByInviteCodeIfMember({
+      inviteCode,
+      profileId: req.profile.profileId,
+    });
+  }
+
+  @Patch(':serverId/invite-code')
+  changeInviteCode(
+    @Param('serverId') serverId: string,
+    @Req() req: RequestWithProfileId,
+  ) {
+    return this.serverService.changeInviteCode({
       serverId,
+      profileId: req.profile.profileId,
+    });
+  }
+
+  @Post(':inviteCode/member')
+  addMemberToServer(
+    @Param('inviteCode') inviteCode: string,
+    @Body('profileId') profileId: string,
+  ) {
+    return this.serverService.addMemberToServer({
+      inviteCode,
+      profileId,
     });
   }
 
@@ -67,7 +101,7 @@ export class ServerController {
     FileInterceptor('image', {
       storage: memoryStorage(),
     }),
-  ) // nhận file từ field 'image'
+  )
   async createServer(
     @UploadedFile() image: Express.Multer.File,
     @Body() body: ServerDTO,
