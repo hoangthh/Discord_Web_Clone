@@ -3,12 +3,17 @@
 import { InitialModal } from "@/components/modals";
 import { useServer } from "@/hooks";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 const SetupPage = () => {
   const router = useRouter();
-  const { server } = useServer();
+  const { server, serverIsLoading } = useServer();
 
-  if (server) router.replace(`/servers/${server.id}`);
+  useEffect(() => {
+    if (server) router.replace(`/servers/${server.id}`);
+  }, [router, server]);
+
+  if (serverIsLoading) return <div>Loading...</div>;
 
   return (
     <div>

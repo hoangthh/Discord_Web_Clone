@@ -3,14 +3,16 @@
 import useSWR from "swr";
 import { PublicConfiguration } from "swr/_internal";
 import { useAuth } from "./use-auth";
+import { axiosInstance } from "@/api-client";
 
 export const useServer = (options?: Partial<PublicConfiguration>) => {
   const { profile } = useAuth();
+
   const {
     data: server,
     error: serverError,
     isLoading: serverIsLoading,
-  } = useSWR(`/server/${profile.id}`, {
+  } = useSWR(`/server/${profile?.id}`, {
     dedupingInterval: 60 * 60 * 1000,
     revalidateOnFocus: false,
     ...options,
@@ -20,11 +22,31 @@ export const useServer = (options?: Partial<PublicConfiguration>) => {
     data: servers,
     error: serversError,
     isLoading: serversIsLoading,
+    mutate,
   } = useSWR(`/server`, {
+    // fallbackData: [],
     dedupingInterval: 60 * 60 * 1000,
     revalidateOnFocus: false,
     ...options,
   });
+
+  const createServer = async ({
+    name,
+    image,
+  }: {
+    name: string;
+    image: File | undefined;
+  }) => {
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("image", image || "");
+
+    await axiosInstance.post("/server", formData, {
+      withCredentials: true,
+    });
+
+    await mutate();
+  };
 
   return {
     server,
@@ -33,7 +55,6 @@ export const useServer = (options?: Partial<PublicConfiguration>) => {
     serversError,
     serverIsLoading,
     serversIsLoading,
+    createServer,
   };
 };
-
-// client gọi lên /auth/me -> lấy thông tin cá nhân bao gồm list server -> đưa vô api call gọi trả về server

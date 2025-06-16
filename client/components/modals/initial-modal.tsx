@@ -1,6 +1,5 @@
 "use client";
 
-import { axiosInstance } from "@/api-client";
 import { FileUpload } from "@/components/file-upload";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,6 +19,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useServer } from "@/hooks";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -36,8 +36,9 @@ const formSchema = z.object({
 });
 
 export const InitialModal = () => {
-  const [isMounted, setIsMounted] = useState(false);
   const router = useRouter();
+  const { createServer } = useServer();
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
@@ -54,13 +55,7 @@ export const InitialModal = () => {
   const isLoading = form.formState.isSubmitting;
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    const formData = new FormData();
-    formData.append("name", values.name);
-    formData.append("image", values.image || ""); // `imageUrl` is File
-
-    await axiosInstance.post("/server", formData, {
-      withCredentials: true,
-    });
+    await createServer({ name: values.name, image: values.image });
 
     form.reset();
     router.refresh();
