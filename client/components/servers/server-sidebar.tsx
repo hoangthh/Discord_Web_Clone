@@ -11,6 +11,14 @@ export const ServerSidebar = ({ serverId }: { serverId: string }) => {
   const { profile, isLoading: profileLoading } = useAuth();
   const { server, isLoading: serverLoading } = useServerByServerId(serverId);
 
+  useEffect(() => {
+    if (profileLoading || serverLoading) return;
+    if (!profile || !server) router.replace("/");
+  }, [profile, router, server, profileLoading, serverLoading]);
+
+  if (profileLoading || serverLoading) return null;
+  if (!profile || !server) return null;
+
   const textChannels = server?.channels.filter(
     (channel: Channel) => channel.type === ChannelType.TEXT,
   );
@@ -28,12 +36,6 @@ export const ServerSidebar = ({ serverId }: { serverId: string }) => {
   const role = server?.members.find(
     (member: Member) => member.profileId === profile?.id,
   )?.role;
-
-  useEffect(() => {
-    if (profileLoading || serverLoading) return;
-
-    if (!profile || !server) router.replace("/");
-  }, [profile, router, server, profileLoading, serverLoading]);
 
   return (
     <div className="text-primary flex h-full w-full flex-col bg-[#F2F3F5] dark:bg-[#2B2D31]">

@@ -7,12 +7,16 @@ import { useEffect } from "react";
 
 const SetupPage = () => {
   const router = useRouter();
-  const { profile } = useAuth();
-  const { server } = useServerByProfileId(profile?.id);
+  const { profile, isLoading: profileLoading } = useAuth();
+  const { server, isLoading: serverLoading } = useServerByProfileId(
+    profile?.id || "",
+  );
 
   useEffect(() => {
     if (server) router.replace(`/servers/${server.id}`);
   }, [router, server]);
+
+  if (profileLoading || serverLoading || server) return;
 
   return (
     <div>
