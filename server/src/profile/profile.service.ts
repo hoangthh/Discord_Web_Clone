@@ -36,4 +36,14 @@ export class ProfileService {
 
     return newProfile;
   }
+
+  async getProfileById(profileId: string) {
+    const profile = await this.prisma.profile.findUnique({
+      where: {
+        id: profileId,
+      },
+    });
+
+    return profile;
+  }
 }

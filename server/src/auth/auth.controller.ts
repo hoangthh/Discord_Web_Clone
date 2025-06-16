@@ -3,10 +3,26 @@ import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
+import { ProfileService } from 'src/profile/profile.service';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+
+interface RequestWithProfile extends Request {
+  profile: {
+    profileId: string;
+  };
+}
 
 @Controller('auth')
 export class AuthController {
-  constructor(private jwtService: JwtService) {}
+  constructor(
+    private jwtService: JwtService,
+    private profileService: ProfileService,
+  ) {}
+
+  @Get('hello')
+  hello() {
+    return 'hello';
+  }
 
   @Get('google')
   @UseGuards(AuthGuard('google'))
@@ -32,5 +48,12 @@ export class AuthController {
 
     const redirectUrl = `${process.env.FRONTEND_URL}`;
     return res.redirect(redirectUrl);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/profile')
+  getProfile(@Req() req: RequestWithProfile) {
+    const profileId = req.profile.profileId;
+    return this.profileService.getProfileById(profileId);
   }
 }

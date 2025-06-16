@@ -7,7 +7,20 @@ import { v4 as uuidv4 } from 'uuid';
 export class ServerService {
   constructor(private prisma: PrismaService) {}
 
-  async findServer(profileId: string) {
+  async findAllServers(profileId: string) {
+    const servers = await this.prisma.server.findMany({
+      where: {
+        members: {
+          some: {
+            profileId,
+          },
+        },
+      },
+    });
+    return servers;
+  }
+
+  async findServerByProfileId(profileId: string) {
     const server = await this.prisma.server.findFirst({
       where: {
         members: {
@@ -17,7 +30,50 @@ export class ServerService {
         },
       },
     });
-    console.log(server);
+    return server;
+  }
+
+  async findServerByServerIdIfMember({
+    serverId,
+    profileId,
+  }: {
+    serverId: string;
+    profileId: string;
+  }) {
+    const server = await this.prisma.server.findUnique({
+      where: {
+        id: serverId,
+        members: {
+          some: {
+            profileId: profileId,
+          },
+        },
+      },
+    });
+    return server;
+  }
+
+  async findServerByServerId({ serverId }: { serverId: string }) {
+    const server = await this.prisma.server.findUnique({
+      where: {
+        id: serverId,
+      },
+      include: {
+        channels: {
+          orderBy: {
+            createdAt: 'asc',
+          },
+        },
+        members: {
+          include: {
+            profile: true,
+          },
+          orderBy: {
+            role: 'asc',
+          },
+        },
+      },
+    });
     return server;
   }
 

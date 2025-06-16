@@ -26,21 +26,43 @@ interface RequestWithProfileId extends Request {
   };
 }
 
-@Controller('server')
+@UseGuards(JwtAuthGuard)
+@Controller('servers')
 export class ServerController {
   constructor(
     private serverService: ServerService,
     private readonly cloudinaryService: CloudinaryService,
   ) {}
 
-  @UseGuards(JwtAuthGuard)
-  @Get(':profileId')
-  findServer(@Param('profileId') profileId: string) {
-    return this.serverService.findServer(profileId);
+  @Get()
+  findAllServers(@Req() req: RequestWithProfileId) {
+    return this.serverService.findAllServers(req.profile.profileId);
+  }
+
+  @Get('profile/:profileId')
+  findServerByProfileId(@Param('profileId') profileId: string) {
+    return this.serverService.findServerByProfileId(profileId);
+  }
+
+  @Get('if-member/:serverId')
+  findServerByServerIdIfMember(
+    @Param('serverId') serverId: string,
+    @Req() req: RequestWithProfileId,
+  ) {
+    return this.serverService.findServerByServerIdIfMember({
+      serverId,
+      profileId: req.profile.profileId,
+    });
+  }
+
+  @Get(':serverId')
+  findServerByServerId(@Param('serverId') serverId: string) {
+    return this.serverService.findServerByServerId({
+      serverId,
+    });
   }
 
   @Post()
-  @UseGuards(JwtAuthGuard)
   @UseInterceptors(
     FileInterceptor('image', {
       storage: memoryStorage(),
