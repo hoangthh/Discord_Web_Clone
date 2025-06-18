@@ -30,9 +30,12 @@ const formSchema = z.object({
   name: z.string().min(1, {
     message: "Server name is required",
   }),
-  image: z
-    .instanceof(File, { message: "A valid image file is required" })
-    .optional(),
+  image: z.union([
+    z.instanceof(File, { message: "A valid image file is required" }),
+    z.literal("").refine(() => false, {
+      message: "Image is required",
+    }),
+  ]),
 });
 
 export const InitialModal = () => {
@@ -48,7 +51,7 @@ export const InitialModal = () => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
-      image: undefined,
+      image: "",
     },
   });
 
@@ -91,6 +94,7 @@ export const InitialModal = () => {
                           onChange={field.onChange}
                         />
                       </FormControl>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -118,7 +122,11 @@ export const InitialModal = () => {
               />
             </div>
             <DialogFooter className="bg-gray-100 px-6 py-4">
-              <Button variant={"primary"} disabled={isLoading}>
+              <Button
+                className="cursor-pointer"
+                variant={"primary"}
+                disabled={isLoading}
+              >
                 Create
               </Button>
             </DialogFooter>
