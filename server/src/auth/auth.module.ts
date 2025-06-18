@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
+import { ProfileModule } from 'src/profile/profile.module';
+import { CloudinaryModule } from 'src/services/cloudinary/cloudinary.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { GoogleStrategy } from './google.strategy';
-import { ProfileModule } from 'src/profile/profile.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { ProfileModule } from 'src/profile/profile.module';
     }),
     PassportModule,
     ProfileModule,
+    CloudinaryModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, GoogleStrategy],
