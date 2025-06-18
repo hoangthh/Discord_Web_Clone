@@ -5,26 +5,39 @@ import Image from "next/image";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 
+type fileType = "imageUrl" | "image";
+
 interface FileUploadProps {
-  onChange: (file?: File) => void;
-  value: File | undefined;
+  onChange: (value?: string | File) => void;
+  value: File | string | undefined;
+  setFileType?: (type: fileType) => void;
 }
 
-export const FileUpload = ({ onChange, value }: FileUploadProps) => {
+export const FileUpload = ({
+  onChange,
+  value,
+  setFileType,
+}: FileUploadProps) => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) onChange(file);
   };
 
+  const handleFileClear = () => {
+    if (setFileType) setFileType("image");
+    onChange("");
+  };
+  console.log("value in file upload: ", value);
   if (value) {
-    const imageUrl = URL.createObjectURL(value);
+    const imageUrl: string =
+      typeof value === "string" ? value : URL.createObjectURL(value);
     return (
       <div className="relative h-30 w-30">
         <Image fill className="rounded-full" src={imageUrl} alt="Upload" />
         <button
           className="absolute top-0 right-0 cursor-pointer rounded-full bg-rose-500 p-1 text-white shadow-sm"
           type="button"
-          onClick={() => onChange()}
+          onClick={handleFileClear}
         >
           <X className="h-4 w-4" />
         </button>

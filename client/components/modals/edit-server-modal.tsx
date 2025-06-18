@@ -22,40 +22,69 @@ import { Input } from "@/components/ui/input";
 import { useModal, useServers } from "@/hooks";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
-const formSchema = z.object({
-  name: z.string().min(1, {
-    message: "Server name is required",
-  }),
-  image: z.union([
-    z.instanceof(File, { message: "A valid image file is required" }),
-    z.literal("").refine(() => false, {
-      message: "Image is required",
+const formSchema = z
+  .object({
+    name: z.string().min(1, {
+      message: "Server name is required",
     }),
-  ]),
-});
+    image: z.instanceof(File),
+    imageUrl: z.string(),
+  })
+  .refine(
+    (data) => {
+      return data.image instanceof File || data.imageUrl.length > 0;
+    },
+    {
+      message: "Server image is required",
+      path: ["imageUrl"],
+    },
+  );
 
-export const CreateServerModal = () => {
-  const { isOpen, onClose, type } = useModal();
-  const { createServer } = useServers();
+export const EditServerModal = () => {
+  const { isOpen, onClose, type, data } = useModal();
+  const { editServer } = useServers();
   const router = useRouter();
+  const [fileType, setFileType] = useState<"image" | "imageUrl">("imageUrl");
 
-  const isModalOpen = isOpen && type === "createServer";
+  const isModalOpen = isOpen && type === "editServer";
+  const { server, mutateServerByServerId } = data;
 
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
-      image: "",
+      image: undefined,
+      imageUrl: "",
     },
   });
+
+  useEffect(() => {
+    if (!isModalOpen || !server) return;
+
+    form.reset({
+      name: server.name,
+      imageUrl: server.imageUrl,
+      image: undefined,
+    });
+    setFileType("imageUrl");
+  }, [isModalOpen, form, server]);
 
   const isLoading = form.formState.isSubmitting;
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    await createServer({ name: values.name, image: values.image });
+    if (server) {
+      await editServer({
+        serverId: server.id,
+        name: values.name,
+        image: values.image,
+      });
+    }
+
+    if (mutateServerByServerId) await mutateServerByServerId();
 
     form.reset();
     router.refresh();
@@ -63,6 +92,7 @@ export const CreateServerModal = () => {
   };
 
   const handleClose = () => {
+    setFileType("imageUrl");
     form.reset();
     onClose();
   };
@@ -85,13 +115,14 @@ export const CreateServerModal = () => {
               <div className="flex items-center justify-center text-center">
                 <FormField
                   control={form.control}
-                  name="image"
+                  name={fileType === "imageUrl" ? "imageUrl" : "image"}
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
                         <FileUpload
                           value={field.value}
                           onChange={field.onChange}
+                          setFileType={setFileType}
                         />
                       </FormControl>
                       <FormMessage />
@@ -127,7 +158,7 @@ export const CreateServerModal = () => {
                 variant={"primary"}
                 disabled={isLoading}
               >
-                Create
+                Save
               </Button>
             </DialogFooter>
           </form>
