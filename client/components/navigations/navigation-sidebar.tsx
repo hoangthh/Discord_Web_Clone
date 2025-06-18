@@ -32,6 +32,7 @@ export const NavigationSidebar = () => {
                 id={server.id}
                 name={server.name}
                 imageUrl={server.imageUrl}
+                priorityImageUrl={servers[0].imageUrl}
               />
             </div>
           ),

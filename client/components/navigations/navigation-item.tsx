@@ -9,9 +9,15 @@ interface NavigationItemProps {
   id: string;
   imageUrl: string;
   name: string;
+  priorityImageUrl: string;
 }
 
-export const NavigationItem = ({ id, imageUrl, name }: NavigationItemProps) => {
+export const NavigationItem = ({
+  id,
+  imageUrl,
+  name,
+  priorityImageUrl,
+}: NavigationItemProps) => {
   const params = useParams();
   const router = useRouter();
 
@@ -39,7 +45,12 @@ export const NavigationItem = ({ id, imageUrl, name }: NavigationItemProps) => {
               "bg-primary/10 text-primary rounded-[16px]",
           )}
         >
-          <Image fill src={imageUrl} alt="Channel" />
+          <Image
+            fill
+            priority={priorityImageUrl === imageUrl}
+            src={imageUrl}
+            alt="Channel"
+          />
         </div>
       </button>
     </ActionTooltip>
