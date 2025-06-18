@@ -5,13 +5,13 @@ import { Server } from "@/models";
 import useSWR from "swr";
 import { SWRConfiguration } from "swr/_internal";
 
-export const useServers = (options?: Partial<SWRConfiguration>) => {
+export const useServers = (options?: Partial<SWRConfiguration<Server[]>>) => {
   const {
     data: servers,
     error,
     isLoading,
     mutate,
-  } = useSWR(`/api/servers`, {
+  } = useSWR<Server[]>(`/api/servers`, {
     ...options,
   });
 
@@ -20,7 +20,7 @@ export const useServers = (options?: Partial<SWRConfiguration>) => {
     image,
   }: {
     name: string;
-    image: File | undefined;
+    image: File | "";
   }) => {
     try {
       const formData = new FormData();
@@ -58,11 +58,35 @@ export const useServers = (options?: Partial<SWRConfiguration>) => {
     }
   };
 
+  const editServer = async ({
+    serverId,
+    name,
+    image,
+  }: {
+    serverId: string;
+    name: string;
+    image: File;
+  }) => {
+    try {
+      console.log({ name, image });
+      const formData = new FormData();
+      formData.append("name", name);
+      if (image) formData.append("image", image);
+
+      await axiosInstance.patch(`/api/servers/${serverId}`, formData);
+
+      await mutate();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return {
     servers,
     error,
     isLoading,
     createServer,
     joinServer,
+    editServer,
   };
 };

@@ -1,10 +1,12 @@
-import { Server } from "@/models";
+import { Server, ServerWithChannelWithMember } from "@/models";
+import { KeyedMutator } from "swr";
 import { create } from "zustand";
 
-export type ModalType = "createServer" | "invite";
+export type ModalType = "createServer" | "invite" | "editServer";
 
 interface ModalData {
   server?: Server;
+  mutateServerByServerId?: KeyedMutator<ServerWithChannelWithMember>;
 }
 
 interface ModalStore {

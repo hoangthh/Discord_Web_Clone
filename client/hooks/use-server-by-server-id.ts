@@ -12,6 +12,7 @@ export const useServerByServerId = (
     data: server,
     error,
     isLoading,
+    mutate,
   } = useSWR<ServerWithChannelWithMember>(`/api/servers/${serverId}`, {
     ...options,
   });
@@ -20,5 +21,6 @@ export const useServerByServerId = (
     server,
     error,
     isLoading,
+    mutate,
   };
 };
