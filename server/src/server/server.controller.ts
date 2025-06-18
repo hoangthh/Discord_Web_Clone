@@ -74,6 +74,30 @@ export class ServerController {
     });
   }
 
+  @Patch(':serverId')
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage: memoryStorage(),
+    }),
+  )
+  async editServer(
+    @Param('serverId') serverId: string,
+    @UploadedFile() image: Express.Multer.File,
+    @Body('name') name: string,
+    @Req() req: RequestWithProfileId,
+  ) {
+    const imageUrl = image
+      ? await this.cloudinaryService.uploadFile(image.buffer)
+      : undefined;
+
+    return this.serverService.editServer({
+      serverId,
+      profileId: req.profile.profileId,
+      name,
+      imageUrl,
+    });
+  }
+
   @Patch(':serverId/invite-code')
   changeInviteCode(
     @Param('serverId') serverId: string,

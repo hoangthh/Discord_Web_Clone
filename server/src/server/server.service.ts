@@ -102,6 +102,32 @@ export class ServerService {
     return server;
   }
 
+  // PATCH: /api/servers/:serverId
+  async editServer({
+    serverId,
+    profileId,
+    name,
+    imageUrl,
+  }: {
+    serverId: string;
+    profileId: string;
+    name: string;
+    imageUrl?: string;
+  }) {
+    const dataToUpdate: { name: string; imageUrl?: string } = { name };
+    if (imageUrl) dataToUpdate.imageUrl = imageUrl;
+
+    const server = await this.prisma.server.update({
+      where: {
+        id: serverId,
+        profileId,
+      },
+      data: dataToUpdate,
+    });
+
+    return server;
+  }
+
   // PATCH: /api/servers/invite-code
   async changeInviteCode({
     serverId,
