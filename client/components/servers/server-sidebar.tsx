@@ -9,7 +9,11 @@ import { ServerHeader } from "@/components/servers";
 export const ServerSidebar = ({ serverId }: { serverId: string }) => {
   const router = useRouter();
   const { profile, isLoading: profileLoading } = useAuth();
-  const { server, isLoading: serverLoading } = useServerByServerId(serverId);
+  const {
+    server,
+    isLoading: serverLoading,
+    mutate: mutateServerByServerId,
+  } = useServerByServerId(serverId);
 
   useEffect(() => {
     if (profileLoading || serverLoading) return;
@@ -39,7 +43,13 @@ export const ServerSidebar = ({ serverId }: { serverId: string }) => {
 
   return (
     <div className="text-primary flex h-full w-full flex-col bg-[#F2F3F5] dark:bg-[#2B2D31]">
-      {server && <ServerHeader server={server} role={role as MemberRole} />}
+      {server && (
+        <ServerHeader
+          server={server}
+          mutateServerByServerId={mutateServerByServerId}
+          role={role as MemberRole}
+        />
+      )}
     </div>
   );
 };

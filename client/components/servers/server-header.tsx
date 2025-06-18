@@ -18,13 +18,19 @@ import {
   Users,
 } from "lucide-react";
 import { useModal } from "@/hooks";
+import { KeyedMutator } from "swr";
 
 interface ServerHeaderProps {
   server: ServerWithChannelWithMember;
+  mutateServerByServerId: KeyedMutator<ServerWithChannelWithMember>;
   role?: MemberRole;
 }
 
-export const ServerHeader = ({ server, role }: ServerHeaderProps) => {
+export const ServerHeader = ({
+  server,
+  role,
+  mutateServerByServerId,
+}: ServerHeaderProps) => {
   const { onOpen } = useModal();
 
   const isAdmin = role === Role.ADMIN;
@@ -51,7 +57,12 @@ export const ServerHeader = ({ server, role }: ServerHeaderProps) => {
             </DropdownMenuItem>
           )}
           {isAdmin && (
-            <DropdownMenuItem className="cursor-pointer px-3 py-2 text-sm">
+            <DropdownMenuItem
+              onClick={() =>
+                onOpen("editServer", { server, mutateServerByServerId })
+              }
+              className="cursor-pointer px-3 py-2 text-sm"
+            >
               Server Settings
               <Settings className="ml-auto h-4 w-4" />
             </DropdownMenuItem>
