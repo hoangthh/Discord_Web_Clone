@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -11,6 +12,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { MemberRole } from '@prisma/client';
 import { Request } from 'express';
 import { memoryStorage } from 'multer';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
@@ -106,6 +108,21 @@ export class ServerController {
     return this.serverService.changeInviteCode({
       serverId,
       profileId: req.profile.profileId,
+    });
+  }
+
+  @Patch(':serverId/members/:memberId')
+  changeMemberRole(
+    @Param('serverId') serverId: string,
+    @Param('memberId') memberId: string,
+    @Req() req: RequestWithProfileId,
+    @Body('role') role: MemberRole,
+  ) {
+    return this.serverService.changeMemberRole({
+      serverId,
+      profileId: req.profile.profileId,
+      memberId,
+      role,
     });
   }
 

@@ -128,7 +128,7 @@ export class ServerService {
     return server;
   }
 
-  // PATCH: /api/servers/invite-code
+  // PATCH: /api/servers/:serverId/invite-code
   async changeInviteCode({
     serverId,
     profileId,
@@ -143,6 +143,52 @@ export class ServerService {
       },
       data: {
         inviteCode: uuidv4(),
+      },
+    });
+    return server;
+  }
+
+  // PATCH: /api/servers/:serverId/members/:memberId
+  async changeMemberRole({
+    serverId,
+    profileId,
+    memberId,
+    role,
+  }: {
+    serverId: string;
+    profileId: string;
+    memberId: string;
+    role: MemberRole;
+  }) {
+    const server = await this.prisma.server.update({
+      where: {
+        id: serverId,
+        profileId,
+      },
+      data: {
+        members: {
+          update: {
+            where: {
+              id: memberId,
+              profileId: {
+                not: profileId,
+              },
+            },
+            data: {
+              role,
+            },
+          },
+        },
+      },
+      include: {
+        members: {
+          include: {
+            profile: true,
+          },
+          orderBy: {
+            role: 'asc',
+          },
+        },
       },
     });
     return server;
