@@ -1,3 +1,4 @@
+import { CloudinaryService } from './../services/cloudinary/cloudinary.service';
 // src/auth/google.strategy.ts
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, VerifyCallback } from 'passport-google-oauth20';
@@ -13,7 +14,10 @@ interface GoogleProfile {
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
-  constructor(private profileService: ProfileService) {
+  constructor(
+    private profileService: ProfileService,
+    private cloudinaryService: CloudinaryService,
+  ) {
     super({
       clientID: process.env.GOOGLE_CLIENT_ID || '',
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
@@ -29,13 +33,23 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     done: VerifyCallback,
   ): Promise<any> {
     const { id, displayName, emails, photos } = googleProfile;
-    const user = {
-      userId: id,
-      name: displayName,
-      email: emails[0].value,
-      imageUrl: photos[0].value,
-    };
-    const profile = await this.profileService.initializeProfile(user);
-    done(null, profile.id);
+    const imageUrlFromGoogle = photos[0].value;
+    try {
+      const uploadedImageUrl =
+        await this.cloudinaryService.uploadFromUrl(imageUrlFromGoogle);
+
+      const user = {
+        userId: id,
+        name: displayName,
+        email: emails[0].value,
+        imageUrl: uploadedImageUrl,
+      };
+
+      const profile = await this.profileService.initializeProfile(user);
+      done(null, profile.id);
+    } catch (error) {
+      console.error('Google Strategy validate error:', error);
+      done(error, false);
+    }
   }
 }

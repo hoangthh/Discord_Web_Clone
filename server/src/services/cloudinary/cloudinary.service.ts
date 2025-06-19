@@ -32,4 +32,18 @@ export class CloudinaryService {
       streamifier.createReadStream(fileBuffer).pipe(uploadStream);
     });
   }
+
+  async uploadFromUrl(imageUrl: string): Promise<string> {
+    try {
+      const result = await cloudinary.uploader.upload(imageUrl, {
+        folder: 'servers',
+      });
+
+      return result.secure_url;
+    } catch (error) {
+      throw new Error(
+        error instanceof Error ? error.message : 'Cloudinary upload failed',
+      );
+    }
+  }
 }
