@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  CreateChannelModal,
   CreateServerModal,
   EditServerModal,
   InviteModal,
@@ -23,6 +24,7 @@ export const ModalProvider = () => {
       <InviteModal />
       <EditServerModal />
       <MembersModal />
+      <CreateChannelModal />
     </>
   );
 };
