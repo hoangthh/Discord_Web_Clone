@@ -25,7 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useModal } from "@/hooks";
+import { useModal, useServerByServerId } from "@/hooks";
 import { ChannelType } from "@/models";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useParams, useRouter } from "next/navigation";
@@ -48,6 +48,7 @@ export const CreateChannelModal = () => {
   const { isOpen, onClose, type } = useModal();
   const router = useRouter();
   const params = useParams<{ serverId: string }>();
+  const { mutate } = useServerByServerId(params.serverId);
 
   const isModalOpen = isOpen && type === "createChannel";
 
@@ -66,6 +67,8 @@ export const CreateChannelModal = () => {
       `/api/servers/${params.serverId}/channels`,
       values,
     );
+
+    await mutate();
 
     form.reset();
     router.refresh();
