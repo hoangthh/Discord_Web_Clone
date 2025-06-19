@@ -12,7 +12,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { MemberRole } from '@prisma/client';
+import { ChannelType, MemberRole } from '@prisma/client';
 import { Request } from 'express';
 import { memoryStorage } from 'multer';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
@@ -126,17 +126,6 @@ export class ServerController {
     });
   }
 
-  @Post(':inviteCode/member')
-  addMemberToServer(
-    @Param('inviteCode') inviteCode: string,
-    @Body('profileId') profileId: string,
-  ) {
-    return this.serverService.addMemberToServer({
-      inviteCode,
-      profileId,
-    });
-  }
-
   @Post()
   @UseInterceptors(
     FileInterceptor('image', {
@@ -156,6 +145,31 @@ export class ServerController {
       name: body.name,
       imageUrl: cloudinaryUrl,
       profileId: req.profile.profileId,
+    });
+  }
+
+  @Post(':serverId/channels')
+  createChannel(
+    @Param('serverId') serverId: string,
+    @Req() req: RequestWithProfileId,
+    @Body() body: { name: string; type: ChannelType },
+  ) {
+    return this.serverService.createChannel({
+      serverId,
+      profileId: req.profile.profileId,
+      name: body.name,
+      type: body.type,
+    });
+  }
+
+  @Post(':inviteCode/member')
+  addMember(
+    @Param('inviteCode') inviteCode: string,
+    @Body('profileId') profileId: string,
+  ) {
+    return this.serverService.addMember({
+      inviteCode,
+      profileId,
     });
   }
 

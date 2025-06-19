@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { MemberRole } from '@prisma/client';
+import { ChannelType, MemberRole } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -194,31 +194,6 @@ export class ServerService {
     return server;
   }
 
-  // POST: /api/servers/:inviteCode/member
-  async addMemberToServer({
-    inviteCode,
-    profileId,
-  }: {
-    inviteCode: string;
-    profileId: string;
-  }) {
-    const server = await this.prisma.server.update({
-      where: {
-        inviteCode,
-      },
-      data: {
-        members: {
-          create: [
-            {
-              profileId,
-            },
-          ],
-        },
-      },
-    });
-    return server;
-  }
-
   // POST: /api/servers
   async createServer({
     name,
@@ -244,6 +219,66 @@ export class ServerService {
       },
     });
     return newServer;
+  }
+
+  // POST: /api/servers/:serverId/channels
+  async createChannel({
+    serverId,
+    profileId,
+    name,
+    type,
+  }: {
+    serverId: string;
+    profileId: string;
+    name: string;
+    type: ChannelType;
+  }) {
+    const server = await this.prisma.server.update({
+      where: {
+        id: serverId,
+        members: {
+          some: {
+            profileId,
+            role: { in: [MemberRole.ADMIN, MemberRole.MODERATOR] },
+          },
+        },
+      },
+      data: {
+        channels: {
+          create: {
+            profileId,
+            name,
+            type,
+          },
+        },
+      },
+    });
+    return server;
+  }
+
+  // POST: /api/servers/:inviteCode/member
+  async addMember({
+    inviteCode,
+    profileId,
+  }: {
+    inviteCode: string;
+    profileId: string;
+  }) {
+    const server = await this.prisma.server.update({
+      where: {
+        inviteCode,
+      },
+      data: {
+        members: {
+          create: [
+            {
+              profileId,
+            },
+          ],
+        },
+      },
+    });
+    return server;
   }
 
   // DELETE: /api/servers/:serverId/members/:memberId
