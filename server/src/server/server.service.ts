@@ -245,4 +245,43 @@ export class ServerService {
     });
     return newServer;
   }
+
+  // DELETE: /api/servers/:serverId/members/:memberId
+  async kickMember({
+    serverId,
+    profileId,
+    memberId,
+  }: {
+    serverId: string;
+    profileId: string;
+    memberId: string;
+  }) {
+    const server = await this.prisma.server.update({
+      where: {
+        id: serverId,
+        profileId,
+      },
+      data: {
+        members: {
+          deleteMany: {
+            id: memberId,
+            profileId: {
+              not: profileId,
+            },
+          },
+        },
+      },
+      include: {
+        members: {
+          include: {
+            profile: true,
+          },
+          orderBy: {
+            role: 'asc',
+          },
+        },
+      },
+    });
+    return server;
+  }
 }

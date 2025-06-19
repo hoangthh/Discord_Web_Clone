@@ -158,4 +158,17 @@ export class ServerController {
       profileId: req.profile.profileId,
     });
   }
+
+  @Delete(':serverId/members/:memberId')
+  kickMember(
+    @Param('serverId') serverId: string,
+    @Param('memberId') memberId: string,
+    @Req() req: RequestWithProfileId,
+  ) {
+    return this.serverService.kickMember({
+      serverId,
+      profileId: req.profile.profileId,
+      memberId,
+    });
+  }
 }
