@@ -27,7 +27,7 @@ export const FileUpload = ({
     if (setFileType) setFileType("image");
     onChange("");
   };
-  console.log("value in file upload: ", value);
+
   if (value) {
     const imageUrl: string =
       typeof value === "string" ? value : URL.createObjectURL(value);
