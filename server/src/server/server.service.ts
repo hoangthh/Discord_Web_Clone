@@ -128,6 +128,38 @@ export class ServerService {
     return server;
   }
 
+  // PATCH: /api/servers/:serverId/leave
+  async leaveServer({
+    serverId,
+    profileId,
+  }: {
+    serverId: string;
+    profileId: string;
+  }) {
+    const server = await this.prisma.server.update({
+      where: {
+        id: serverId,
+        profileId: {
+          not: profileId,
+        },
+        members: {
+          some: {
+            profileId,
+          },
+        },
+      },
+      data: {
+        members: {
+          deleteMany: {
+            profileId,
+          },
+        },
+      },
+    });
+
+    return server;
+  }
+
   // PATCH: /api/servers/:serverId/invite-code
   async changeInviteCode({
     serverId,

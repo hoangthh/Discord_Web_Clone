@@ -100,6 +100,17 @@ export class ServerController {
     });
   }
 
+  @Patch(':serverId/leave')
+  async leaveServer(
+    @Param('serverId') serverId: string,
+    @Req() req: RequestWithProfileId,
+  ) {
+    return this.serverService.leaveServer({
+      serverId,
+      profileId: req.profile.profileId,
+    });
+  }
+
   @Patch(':serverId/invite-code')
   changeInviteCode(
     @Param('serverId') serverId: string,
