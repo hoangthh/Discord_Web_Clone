@@ -6,6 +6,8 @@ export const ChannelType = {
   VIDEO: "VIDEO",
 };
 
+export type ChannelTypeEnum = "TEXT" | "AUDIO" | "VIDEO";
+
 export interface Channel extends ApiResponse {
   name: string;
   type: string;
