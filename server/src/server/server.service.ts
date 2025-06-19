@@ -313,6 +313,23 @@ export class ServerService {
     return server;
   }
 
+  // DELETE: /api/servers/:serverId
+  async deleteServer({
+    serverId,
+    profileId,
+  }: {
+    serverId: string;
+    profileId: string;
+  }) {
+    const server = await this.prisma.server.delete({
+      where: {
+        id: serverId,
+        profileId,
+      },
+    });
+    return server;
+  }
+
   // DELETE: /api/servers/:serverId/members/:memberId
   async kickMember({
     serverId,

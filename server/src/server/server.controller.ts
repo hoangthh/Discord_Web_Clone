@@ -184,6 +184,17 @@ export class ServerController {
     });
   }
 
+  @Delete(':serverId')
+  deleteServer(
+    @Param('serverId') serverId: string,
+    @Req() req: RequestWithProfileId,
+  ) {
+    return this.serverService.deleteServer({
+      serverId,
+      profileId: req.profile.profileId,
+    });
+  }
+
   @Delete(':serverId/members/:memberId')
   kickMember(
     @Param('serverId') serverId: string,
