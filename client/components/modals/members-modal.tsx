@@ -40,7 +40,6 @@ interface RoleIconMap {
   [key: string]: JSX.Element | null;
 }
 
-// Dùng Map để linh hoạt với key kiểu string
 const roleIconMap: RoleIconMap = {
   GUEST: null,
   MODERATOR: <ShieldCheck className="ml-2 h-4 w-4 text-indigo-500" />,
@@ -58,6 +57,7 @@ export const MembersModal = () => {
   const handleKick = async (memberId: string) => {
     try {
       setLoadingId(memberId);
+
       const response = await axiosInstance.delete(
         `/api/servers/${server.id}/members/${memberId}`,
       );
@@ -73,13 +73,13 @@ export const MembersModal = () => {
 
   const handleRoleChange = async (memberId: string, role: MemberRole) => {
     try {
-      console.log({ role });
       setLoadingId(memberId);
+
       const response = await axiosInstance.patch(
         `/api/servers/${server.id}/members/${memberId}`,
         { role },
       );
-      console.log(response.data);
+
       router.refresh();
       onOpen("members", { server: response.data });
     } catch (error) {
