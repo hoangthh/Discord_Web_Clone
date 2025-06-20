@@ -1,6 +1,5 @@
 "use client";
 
-import { axiosInstance } from "@/api-client";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -25,7 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useModal, useServerByServerId } from "@/hooks";
+import { useChannel, useModal } from "@/hooks";
 import { ChannelType } from "@/models";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useParams, useRouter } from "next/navigation";
@@ -49,7 +48,7 @@ export const CreateChannelModal = () => {
   const { isOpen, onClose, type, data } = useModal();
   const router = useRouter();
   const params = useParams<{ serverId: string }>();
-  const { mutate } = useServerByServerId(params.serverId);
+  const { createChannel } = useChannel(params.serverId);
 
   const isModalOpen = isOpen && type === "createChannel";
   const { channelType } = data;
@@ -73,12 +72,7 @@ export const CreateChannelModal = () => {
   const isLoading = form.formState.isSubmitting;
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    await axiosInstance.post(
-      `/api/servers/${params.serverId}/channels`,
-      values,
-    );
-
-    await mutate();
+    await createChannel(params.serverId, values);
 
     form.reset();
     router.refresh();

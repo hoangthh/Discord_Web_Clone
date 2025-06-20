@@ -1,6 +1,5 @@
 "use client";
 
-import { axiosInstance } from "@/api-client";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useModal } from "@/hooks";
+import { useChannel, useModal } from "@/hooks";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -21,15 +20,15 @@ export const DeleteChannelModal = () => {
 
   const isModalOpen = isOpen && type === "deleteChannel";
   const { server, channel } = data;
+  const { deleteChannel } = useChannel(server?.id as string);
 
   const handleConfirm = async () => {
     try {
       if (!server || !channel) return;
+
       setIsLoading(true);
 
-      await axiosInstance.delete(
-        `/api/servers/${server.id}/channels/${channel.id}`,
-      );
+      await deleteChannel(server, channel);
 
       onClose();
       router.refresh();
@@ -50,9 +49,10 @@ export const DeleteChannelModal = () => {
           </DialogTitle>
           <DialogDescription className="text-center text-zinc-500">
             Are you sure to do this? <br />
+            Channel{" "}
             <span className="font-semibold text-indigo-500">
               #{channel?.name}
-            </span>
+            </span>{" "}
             will be permanently deleted
           </DialogDescription>
         </DialogHeader>
