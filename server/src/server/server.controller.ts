@@ -195,6 +195,19 @@ export class ServerController {
     });
   }
 
+  @Delete(':serverId/channels/:channelId')
+  deleteChannel(
+    @Param('serverId') serverId: string,
+    @Param('channelId') channelId: string,
+    @Req() req: RequestWithProfileId,
+  ) {
+    return this.serverService.deleteChannel({
+      serverId,
+      channelId,
+      profileId: req.profile.profileId,
+    });
+  }
+
   @Delete(':serverId/members/:memberId')
   kickMember(
     @Param('serverId') serverId: string,

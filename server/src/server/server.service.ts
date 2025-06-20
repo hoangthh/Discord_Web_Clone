@@ -330,6 +330,42 @@ export class ServerService {
     return server;
   }
 
+  // DELETE: /api/servers/:serverId/channels/:channelId
+  async deleteChannel({
+    serverId,
+    channelId,
+    profileId,
+  }: {
+    serverId: string;
+    channelId: string;
+    profileId: string;
+  }) {
+    const server = await this.prisma.server.update({
+      where: {
+        id: serverId,
+        members: {
+          some: {
+            profileId,
+            role: {
+              in: [MemberRole.ADMIN, MemberRole.MODERATOR],
+            },
+          },
+        },
+      },
+      data: {
+        channels: {
+          delete: {
+            id: channelId,
+            name: {
+              not: 'general',
+            },
+          },
+        },
+      },
+    });
+    return server;
+  }
+
   // DELETE: /api/servers/:serverId/members/:memberId
   async kickMember({
     serverId,
