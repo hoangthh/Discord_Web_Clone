@@ -4,6 +4,8 @@ import { AuthModule } from './auth/auth.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ProfileModule } from './profile/profile.module';
 import { ServerModule } from './server/server.module';
+import { ChannelModule } from './channel/channel.module';
+import { MemberModule } from './member/member.module';
 
 @Module({
   imports: [
@@ -12,6 +14,8 @@ import { ServerModule } from './server/server.module';
     PrismaModule,
     ProfileModule,
     ServerModule,
+    ChannelModule,
+    MemberModule,
   ],
   controllers: [],
   providers: [],
