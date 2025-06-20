@@ -4,7 +4,7 @@ import { ServerWithChannel } from "@/models";
 import useSWR from "swr";
 import { SWRConfiguration } from "swr/_internal";
 
-export const useGeneralChannelServerByServerId = (
+export const useServerWithGeneralChannelByServerId = (
   serverId: string,
   options?: Partial<SWRConfiguration<ServerWithChannel>>,
 ) => {
