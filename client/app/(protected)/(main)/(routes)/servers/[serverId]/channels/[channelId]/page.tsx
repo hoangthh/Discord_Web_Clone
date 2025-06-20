@@ -1,5 +1,6 @@
 "use client";
 
+import { ChatHeader } from "@/components/chats";
 import {
   useAuth,
   useChannelByChannelId,
@@ -35,7 +36,14 @@ const ChannelIdPage = () => {
 
   return (
     <div className="flex h-full flex-col bg-white dark:bg-[#313338]">
-      Channel Id Page
+      {channel && (
+        <ChatHeader
+          serverId={channel?.serverId}
+          name={channel?.name}
+          type="channel"
+          imageUrl=""
+        />
+      )}
     </div>
   );
 };
