@@ -8,12 +8,11 @@ export interface Server extends ApiResponse {
   profileId: string;
 }
 
-export interface ServerWithChannelWithMember extends Server, ApiResponse {
+export interface ServerWithChannelWithMember extends Server {
   channels: Channel[];
   members: MemberWithProfile[];
 }
 
-// export interface Servers extends ApiResponse {
-//   channels: Channel[];
-//   members: Member[];
-// }
+export interface ServerWithChannel extends Server {
+  channels: Channel[];
+}

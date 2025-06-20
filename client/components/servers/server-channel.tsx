@@ -5,7 +5,7 @@ import { Channel, ChannelType, MemberRole, Role, Server } from "@/models";
 import { Edit, Hash, Lock, Mic, Trash, Video } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { ActionTooltip } from "@/components/action-tooltip";
-import { useModal } from "@/hooks";
+import { ModalType, useModal } from "@/hooks";
 
 interface ServerChannelProps {
   channel: Channel;
@@ -24,15 +24,24 @@ export const ServerChannel = ({
   server,
   role,
 }: ServerChannelProps) => {
-  const params = useParams<{ channelId: string }>();
+  const params = useParams<{ serverId: string; channelId: string }>();
   const router = useRouter();
   const { onOpen } = useModal();
 
   const Icon = iconMap[channel.type];
 
+  const handleClick = () => {
+    router.push(`/servers/${params.serverId}/channels/${channel.id}`);
+  };
+
+  const handleAction = (e: React.MouseEvent, action: ModalType) => {
+    e.stopPropagation();
+    onOpen(action, { server, channel });
+  };
+
   return (
     <button
-      onClick={() => {}}
+      onClick={handleClick}
       className={cn(
         "group mb-1 flex w-full cursor-pointer items-center gap-x-2 rounded-md px-2 py-2 transition hover:bg-zinc-700/10 dark:hover:bg-zinc-700/50",
         params?.channelId === channel.id && "bg-zinc-700/20 dark:bg-zinc-700",
@@ -52,13 +61,13 @@ export const ServerChannel = ({
         <div className="ml-auto flex items-center gap-x-2">
           <ActionTooltip label="Edit">
             <Edit
-              onClick={() => onOpen("editChannel", { server, channel })}
+              onClick={(e) => handleAction(e, "editChannel")}
               className="hidden h-4 w-4 text-zinc-500 transition group-hover:block hover:text-zinc-600 dark:text-zinc-400 dark:hover:text-zinc-300"
             />
           </ActionTooltip>
           <ActionTooltip label="Delete">
             <Trash
-              onClick={() => onOpen("deleteChannel", { server, channel })}
+              onClick={(e) => handleAction(e, "deleteChannel")}
               className="hidden h-4 w-4 text-zinc-500 transition group-hover:block hover:text-zinc-600 dark:text-zinc-400 dark:hover:text-zinc-300"
             />
           </ActionTooltip>
