@@ -1,4 +1,5 @@
 export * from "./use-auth";
+export * from "./use-channel";
 export * from "./use-modal-store";
 export * from "./use-origin";
 export * from "./use-server-by-invite-code-if-member";
