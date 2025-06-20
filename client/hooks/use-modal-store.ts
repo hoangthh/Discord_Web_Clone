@@ -1,4 +1,9 @@
-import { ChannelTypeEnum, Server, ServerWithChannelWithMember } from "@/models";
+import {
+  Channel,
+  ChannelTypeEnum,
+  Server,
+  ServerWithChannelWithMember,
+} from "@/models";
 import { KeyedMutator } from "swr";
 import { create } from "zustand";
 
@@ -9,12 +14,14 @@ export type ModalType =
   | "members"
   | "createChannel"
   | "leaveServer"
-  | "deleteServer";
+  | "deleteServer"
+  | "deleteChannel";
 
 interface ModalData {
   server?: Server;
-  mutateServerByServerId?: KeyedMutator<ServerWithChannelWithMember>;
+  channel?: Channel;
   channelType?: ChannelTypeEnum | string;
+  mutateServerByServerId?: KeyedMutator<ServerWithChannelWithMember>;
 }
 
 interface ModalStore {
