@@ -59,7 +59,38 @@ export class ServerService {
         id: serverId,
         members: {
           some: {
-            profileId: profileId,
+            profileId,
+          },
+        },
+      },
+    });
+    return server;
+  }
+
+  // GET: /api/server/:serverId/channels/general
+  async findGeneralChannelServerByServerId({
+    serverId,
+    profileId,
+  }: {
+    serverId: string;
+    profileId: string;
+  }) {
+    const server = await this.prisma.server.findUnique({
+      where: {
+        id: serverId,
+        members: {
+          some: {
+            profileId,
+          },
+        },
+      },
+      include: {
+        channels: {
+          where: {
+            name: 'general',
+          },
+          orderBy: {
+            createdAt: 'asc',
           },
         },
       },

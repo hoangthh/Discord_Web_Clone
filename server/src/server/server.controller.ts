@@ -60,6 +60,18 @@ export class ServerController {
     });
   }
 
+  @Get(':serverId/channels/general')
+  findGeneralChannelServerByServerId(
+    @Param('serverId') serverId: string,
+    @Req() req: RequestWithProfileId,
+  ) {
+    // return { serverId, profileId: req.profile.profileId };
+    return this.serverService.findGeneralChannelServerByServerId({
+      serverId,
+      profileId: req.profile.profileId,
+    });
+  }
+
   @Get('profile/:profileId')
   findServerByProfileId(@Param('profileId') profileId: string) {
     return this.serverService.findServerByProfileId(profileId);
