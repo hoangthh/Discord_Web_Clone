@@ -137,6 +137,22 @@ export class ServerController {
     });
   }
 
+  @Patch(':serverId/channels/:channelId')
+  editChannel(
+    @Param('serverId') serverId: string,
+    @Param('channelId') channelId: string,
+    @Req() req: RequestWithProfileId,
+    @Body() body: { name: string; type: ChannelType },
+  ) {
+    return this.serverService.editChannel({
+      serverId,
+      channelId,
+      profileId: req.profile.profileId,
+      name: body.name,
+      type: body.type,
+    });
+  }
+
   @Post()
   @UseInterceptors(
     FileInterceptor('image', {

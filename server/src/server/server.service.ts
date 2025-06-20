@@ -226,6 +226,52 @@ export class ServerService {
     return server;
   }
 
+  // PATCH: /api/servers/:serverId/channels/:channelId
+  async editChannel({
+    serverId,
+    channelId,
+    profileId,
+    name,
+    type,
+  }: {
+    serverId: string;
+    channelId: string;
+    profileId: string;
+    name: string;
+    type: ChannelType;
+  }) {
+    const server = await this.prisma.server.update({
+      where: {
+        id: serverId,
+        members: {
+          some: {
+            profileId,
+            role: {
+              in: [MemberRole.ADMIN, MemberRole.MODERATOR],
+            },
+          },
+        },
+      },
+      data: {
+        channels: {
+          update: {
+            where: {
+              id: channelId,
+              NOT: {
+                name: 'general',
+              },
+            },
+            data: {
+              name,
+              type,
+            },
+          },
+        },
+      },
+    });
+    return server;
+  }
+
   // POST: /api/servers
   async createServer({
     name,
