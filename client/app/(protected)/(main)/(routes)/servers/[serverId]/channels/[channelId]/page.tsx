@@ -1,6 +1,6 @@
 "use client";
 
-import { ChatHeader } from "@/components/chats";
+import { ChatHeader, ChatInput } from "@/components/chats";
 import {
   useAuth,
   useChannelByChannelId,
@@ -41,6 +41,18 @@ const ChannelIdPage = () => {
           serverId={channel?.serverId}
           name={channel?.name}
           type="channel"
+        />
+      )}
+      <div className="flex-1">Future Messages</div>
+      {channel && (
+        <ChatInput
+          name={channel.name}
+          type="channel"
+          apiUrl="/api/socket/messages"
+          body={{
+            channelId: channel.id,
+            serverId: channel.serverId,
+          }}
         />
       )}
     </div>
