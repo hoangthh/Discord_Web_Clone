@@ -176,13 +176,9 @@ export class ServerController {
     @Body() body: ServerDTO,
     @Req() req: RequestWithProfileId,
   ) {
-    let cloudinaryUrl = '';
-    if (image)
-      cloudinaryUrl = await this.cloudinaryService.uploadFile(image.buffer);
-
     return this.serverService.createServer({
       name: body.name,
-      imageUrl: cloudinaryUrl,
+      image,
       profileId: req.profile.profileId,
     });
   }

@@ -1,11 +1,19 @@
+import { CloudinaryService } from './../services/cloudinary/cloudinary.service';
 import { Injectable } from '@nestjs/common';
-import { ChannelType, MemberRole } from '@prisma/client';
+import { ChannelType, Member, MemberRole, Server } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { v4 as uuidv4 } from 'uuid';
 
+interface ServerWithMembers extends Server {
+  members: Member[];
+}
+
 @Injectable()
 export class ServerService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private cloudinaryService: CloudinaryService,
+  ) {}
 
   // GET: /api/servers
   async findAllServers(profileId: string) {
@@ -306,17 +314,21 @@ export class ServerService {
   // POST: /api/servers
   async createServer({
     name,
-    imageUrl,
+    image,
     profileId,
   }: {
     name: string;
-    imageUrl: string;
+    image: Express.Multer.File;
     profileId: string;
   }) {
+    let cloudinaryUrl = '';
+    if (image)
+      cloudinaryUrl = await this.cloudinaryService.uploadFile(image.buffer);
+
     const newServer = this.prisma.server.create({
       data: {
         name,
-        imageUrl,
+        imageUrl: cloudinaryUrl,
         inviteCode: uuidv4(),
         profileId,
         channels: {
@@ -477,6 +489,29 @@ export class ServerService {
             role: 'asc',
           },
         },
+      },
+    });
+    return server;
+  }
+
+  async findFirstServerSocket({
+    serverId,
+    profileId,
+  }: {
+    serverId: string;
+    profileId: string;
+  }): Promise<ServerWithMembers | null> {
+    const server = await this.prisma.server.findFirst({
+      where: {
+        id: serverId,
+        members: {
+          some: {
+            profileId,
+          },
+        },
+      },
+      include: {
+        members: true,
       },
     });
     return server;

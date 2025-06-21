@@ -5,5 +5,6 @@ import { ChannelService } from './channel.service';
 @Module({
   controllers: [ChannelController],
   providers: [ChannelService],
+  exports: [ChannelService],
 })
 export class ChannelModule {}

@@ -7,5 +7,6 @@ import { ServerService } from './server.service';
   imports: [CloudinaryModule],
   controllers: [ServerController],
   providers: [ServerService],
+  exports: [ServerService],
 })
 export class ServerModule {}
