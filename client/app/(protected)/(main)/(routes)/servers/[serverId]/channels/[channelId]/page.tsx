@@ -41,7 +41,6 @@ const ChannelIdPage = () => {
           serverId={channel?.serverId}
           name={channel?.name}
           type="channel"
-          imageUrl=""
         />
       )}
     </div>
