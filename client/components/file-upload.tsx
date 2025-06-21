@@ -52,7 +52,7 @@ export const FileUpload = ({
         className="flex cursor-pointer flex-col items-center justify-center"
       >
         <CloudUpload className="h-15 w-15 cursor-pointer text-indigo-500" />
-        <p className="text-indigo-500">Choose image for your server</p>
+        <p className="text-indigo-500">Choose image to upload</p>
       </Label>
       <Input
         id="picture"

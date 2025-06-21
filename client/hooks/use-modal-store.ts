@@ -16,12 +16,18 @@ export type ModalType =
   | "leaveServer"
   | "deleteServer"
   | "deleteChannel"
-  | "editChannel";
+  | "editChannel"
+  | "messageFile";
 
 interface ModalData {
   server?: Server;
   channel?: Channel;
   channelType?: ChannelTypeEnum | string;
+  apiUrl?: string;
+  body?: {
+    channelId: string;
+    serverId: string;
+  };
   mutateServerByServerId?: KeyedMutator<ServerWithChannelWithMember>;
 }
 
