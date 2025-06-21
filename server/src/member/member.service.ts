@@ -17,6 +17,9 @@ export class MemberService {
         serverId,
         profileId,
       },
+      include: {
+        profile: true,
+      },
     });
     return member;
   }

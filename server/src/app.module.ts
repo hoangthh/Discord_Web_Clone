@@ -6,6 +6,7 @@ import { ProfileModule } from './profile/profile.module';
 import { ServerModule } from './server/server.module';
 import { ChannelModule } from './channel/channel.module';
 import { MemberModule } from './member/member.module';
+import { ConversationModule } from './conversation/conversation.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { MemberModule } from './member/member.module';
     ServerModule,
     ChannelModule,
     MemberModule,
+    ConversationModule,
   ],
   controllers: [],
   providers: [],
