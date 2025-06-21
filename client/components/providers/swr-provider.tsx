@@ -5,7 +5,7 @@ import { SWRConfig } from "swr";
 
 const MILISECOND_PER_HOUR = 60 * 60 * 1000;
 
-export function Providers({ children }: { children: React.ReactNode }) {
+export function SWRProvider({ children }: { children: React.ReactNode }) {
   return (
     <SWRConfig
       value={{

@@ -1,6 +1,7 @@
 import {
   ModalProvider,
-  Providers,
+  SocketProvider,
+  SWRProvider,
   ThemeProvider,
 } from "@/components/providers";
 import { cn } from "@/lib/utils";
@@ -31,17 +32,19 @@ export default async function RootLayout({
           "bg-white dark:bg-[#313338]",
         )}
       >
-        <Providers>
+        <SWRProvider>
           <ThemeProvider
             attribute="class"
             defaultTheme="dark"
             enableSystem={false}
             storageKey="discord-clone-theme"
           >
-            <ModalProvider />
-            {children}
+            <SocketProvider>
+              <ModalProvider />
+              {children}
+            </SocketProvider>
           </ThemeProvider>
-        </Providers>
+        </SWRProvider>
       </body>
     </html>
   );
