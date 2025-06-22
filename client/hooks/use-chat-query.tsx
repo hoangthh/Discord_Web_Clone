@@ -18,16 +18,19 @@ export const useChatQuery = ({
   const { isConnected } = useSocket();
 
   const fetchMessages = async ({ pageParam = undefined }) => {
-    const response = await axiosInstance.get(
-      `${apiUrl}/${paramKey}/${paramValue}`,
-      {
-        params: {
-          cursor: pageParam,
+    try {
+      const response = await axiosInstance.get(
+        `${apiUrl}/${paramKey}/${paramValue}`,
+        {
+          params: {
+            cursor: pageParam,
+          },
         },
-      },
-    );
-
-    return response.data;
+      );
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
   };
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } =
@@ -35,7 +38,7 @@ export const useChatQuery = ({
       queryKey: [queryKey],
       queryFn: fetchMessages,
       initialPageParam: undefined,
-      getNextPageParam: (lastPage) => lastPage?.nextCursor,
+      getNextPageParam: (lastPage) => lastPage?.nextCursor || undefined,
       refetchInterval: isConnected ? false : 1000,
     });
 

@@ -2,6 +2,7 @@ export * from "./use-auth";
 export * from "./use-channel";
 export * from "./use-channel-by-channel-id";
 export * from "./use-chat-query";
+export * from "./use-chat-scroll";
 export * from "./use-chat-socket";
 export * from "./use-conversation";
 export * from "./use-first-member-by-server-id-if-member";

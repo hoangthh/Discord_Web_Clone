@@ -101,8 +101,6 @@ export const ChatItem = ({
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      console.log(values);
-
       await axiosInstance.patch(`${socketUrl}/${paramKey}/${paramValue}`, {
         content: values.content,
         channelId: socketBody.channelId,
