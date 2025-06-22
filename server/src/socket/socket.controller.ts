@@ -5,6 +5,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Req,
   UploadedFile,
   UseGuards,
@@ -55,13 +56,14 @@ export class SocketController {
   @Delete('messages/:messageId')
   deleteMessageByMessageId(
     @Param('messageId') messageId: string,
-    @Body() body: UpdateMessageDto,
+    @Query('channelId') channelId: string,
+    @Query('serverId') serverId: string,
     @Req() req: RequestWithProfileId,
   ) {
     return this.socketGateway.deleteMessageByMessageId({
       messageId,
-      channelId: body.channelId,
-      serverId: body.serverId,
+      channelId,
+      serverId,
       profileId: req.profile.profileId,
     });
   }
