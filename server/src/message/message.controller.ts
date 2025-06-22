@@ -1,25 +1,18 @@
-import { Controller, Get, Query, Req, UseGuards } from '@nestjs/common';
-import { MessageService } from './message.service';
+import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-
-interface RequestWithProfileId extends Request {
-  profile: {
-    profileId: string;
-  };
-}
+import { MessageService } from './message.service';
 
 @UseGuards(JwtAuthGuard)
-@Controller('messages')
+@Controller('messages/channels/:channelId')
 export class MessageController {
   constructor(private messageService: MessageService) {}
 
   @Get()
-  findMessages(
-    @Req() req: RequestWithProfileId,
+  findMessagesByChannelId(
     @Query('cursor') cursor: string,
-    @Query('channelId') channelId: string,
+    @Param('channelId') channelId: string,
   ) {
-    return this.messageService.findMessages({
+    return this.messageService.findMessagesByChannelId({
       cursor,
       channelId,
     });

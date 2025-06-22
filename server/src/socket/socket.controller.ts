@@ -1,22 +1,29 @@
 import {
   Body,
   Controller,
+  Delete,
+  Param,
+  Patch,
   Post,
   Req,
   UploadedFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { SocketGateway } from './socket.gateway';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { UpdateMessageDto } from './dto/update-message.dto';
+import { SocketGateway } from './socket.gateway';
 
-interface CreateMessageBody {
+interface UpdateMessageBody {
   content: string;
-  fileUrl: string;
   channelId: string;
   serverId: string;
+}
+
+interface CreateMessageBody extends UpdateMessageBody {
+  fileUrl: string;
 }
 
 interface RequestWithProfileId extends Request {
@@ -30,6 +37,35 @@ interface RequestWithProfileId extends Request {
 export class SocketController {
   constructor(private socketGateway: SocketGateway) {}
 
+  @Patch('messages/:messageId')
+  editMessageByMessageId(
+    @Param('messageId') messageId: string,
+    @Body() body: UpdateMessageDto,
+    @Req() req: RequestWithProfileId,
+  ) {
+    return this.socketGateway.editMessageByMessageId({
+      content: body.content,
+      messageId,
+      channelId: body.channelId,
+      serverId: body.serverId,
+      profileId: req.profile.profileId,
+    });
+  }
+
+  @Delete('messages/:messageId')
+  deleteMessageByMessageId(
+    @Param('messageId') messageId: string,
+    @Body() body: UpdateMessageDto,
+    @Req() req: RequestWithProfileId,
+  ) {
+    return this.socketGateway.deleteMessageByMessageId({
+      messageId,
+      channelId: body.channelId,
+      serverId: body.serverId,
+      profileId: req.profile.profileId,
+    });
+  }
+
   @Post('messages')
   @Post()
   @UseInterceptors(
@@ -42,14 +78,6 @@ export class SocketController {
     @Body() body: CreateMessageBody,
     @Req() req: RequestWithProfileId,
   ) {
-    // return console.log({
-    //   content: body.content,
-    //   fileUrl: body.fileUrl,
-    //   channelId: body.channelId,
-    //   serverId: body.serverId,
-    //   profileId: req.profile.profileId,
-    // });
-
     return this.socketGateway.createMessage({
       content: body.content,
       image,

@@ -8,7 +8,7 @@ const MESSAGE_BATCH = 10;
 export class MessageService {
   constructor(private prisma: PrismaService) {}
 
-  async findMessages({
+  async findMessagesByChannelId({
     cursor,
     channelId,
   }: {
@@ -67,6 +67,78 @@ export class MessageService {
       items: messages,
       nextCursor,
     };
+  }
+
+  async findFirstMessageSocket({
+    messageId,
+    channelId,
+  }: {
+    messageId: string;
+    channelId: string;
+  }) {
+    const message = this.prisma.message.findFirst({
+      where: {
+        id: messageId,
+        channelId,
+      },
+      include: {
+        member: {
+          include: {
+            profile: true,
+          },
+        },
+      },
+    });
+
+    return message;
+  }
+
+  async editMessageByMessageIdSocket({
+    messageId,
+    content,
+  }: {
+    messageId: string;
+    content: string;
+  }) {
+    const message = this.prisma.message.update({
+      where: {
+        id: messageId,
+      },
+      data: {
+        content,
+      },
+      include: {
+        member: {
+          include: {
+            profile: true,
+          },
+        },
+      },
+    });
+
+    return message;
+  }
+
+  async deleteMessageByMessageIdSocket(messageId: string) {
+    const message = this.prisma.message.update({
+      where: {
+        id: messageId,
+      },
+      data: {
+        fileUrl: '',
+        content: 'This message has been deleted.',
+        deleted: true,
+      },
+      include: {
+        member: {
+          include: {
+            profile: true,
+          },
+        },
+      },
+    });
+
+    return message;
   }
 
   async createMessageSocket({
