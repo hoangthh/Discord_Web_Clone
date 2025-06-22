@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { UserAvatar } from "@/components/user-avatar";
+import { useModal } from "@/hooks";
 import { cn } from "@/lib/utils";
 import { MemberWithProfile, Role } from "@/models";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -27,7 +28,11 @@ interface ChatItemProps {
   socketUrl: string;
   paramKey: "messages" | "conversations";
   paramValue: string;
-  body: {
+  socketQuery: {
+    channelId: string;
+    serverId: string;
+  };
+  socketBody: {
     channelId: string;
     serverId: string;
   };
@@ -59,10 +64,11 @@ export const ChatItem = ({
   socketUrl,
   paramKey,
   paramValue,
-  body,
+  socketQuery,
+  socketBody,
 }: ChatItemProps) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const { onOpen } = useModal();
 
   useEffect(() => {
     const handleKeyDown = (event: any) => {
@@ -89,8 +95,8 @@ export const ChatItem = ({
 
       await axiosInstance.patch(`${socketUrl}/${paramKey}/${paramValue}`, {
         content: values.content,
-        channelId: body.channelId,
-        serverId: body.serverId,
+        channelId: socketBody.channelId,
+        serverId: socketBody.serverId,
       });
 
       form.reset();
@@ -210,7 +216,15 @@ export const ChatItem = ({
             </ActionTooltip>
           )}
           <ActionTooltip label="Delete">
-            <Trash className="ml-auto h-4 w-4 cursor-pointer text-zinc-500 transition hover:text-zinc-600 dark:hover:text-zinc-300" />
+            <Trash
+              onClick={() =>
+                onOpen("deleteMessage", {
+                  apiUrl: `${socketUrl}/${paramKey}/${paramValue}`,
+                  query: socketQuery,
+                })
+              }
+              className="ml-auto h-4 w-4 cursor-pointer text-zinc-500 transition hover:text-zinc-600 dark:hover:text-zinc-300"
+            />
           </ActionTooltip>
         </div>
       )}

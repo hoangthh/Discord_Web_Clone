@@ -17,7 +17,11 @@ interface ChatMessagesProps {
   apiUrl: string;
   paramKey: "channels" | "conversations";
   paramValue: string;
-  body: {
+  socketQuery: {
+    channelId: string;
+    serverId: string;
+  };
+  socketBody: {
     channelId: string;
     serverId: string;
   };
@@ -31,7 +35,8 @@ export const ChatMessages = ({
   apiUrl,
   paramKey,
   paramValue,
-  body,
+  socketQuery,
+  socketBody,
 }: ChatMessagesProps) => {
   const queryKey = `chat:${chatId}`;
 
@@ -87,7 +92,8 @@ export const ChatMessages = ({
                 socketUrl="/api/socket"
                 paramKey="messages"
                 paramValue={message.id}
-                body={body}
+                socketQuery={socketQuery}
+                socketBody={socketBody}
               />
             ))}
           </Fragment>
