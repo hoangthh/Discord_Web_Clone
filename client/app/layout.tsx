@@ -1,5 +1,6 @@
 import {
   ModalProvider,
+  QueryProvider,
   SocketProvider,
   SWRProvider,
   ThemeProvider,
@@ -41,7 +42,7 @@ export default async function RootLayout({
           >
             <SocketProvider>
               <ModalProvider />
-              {children}
+              <QueryProvider>{children}</QueryProvider>
             </SocketProvider>
           </ThemeProvider>
         </SWRProvider>
