@@ -118,7 +118,7 @@ export class SocketGateway
       content,
     });
 
-    const updateKey = `chat:${channelId}:message:update`;
+    const updateKey = `chat:${channelId}:messages:update`;
 
     this.server.emit(updateKey, message);
 
@@ -160,7 +160,7 @@ export class SocketGateway
     message =
       await this.messageService.deleteMessageByMessageIdSocket(messageId);
 
-    const updateKey = `chat:${channelId}:message:update`;
+    const updateKey = `chat:${channelId}:messages:update`;
 
     this.server.emit(updateKey, message);
 
