@@ -4,24 +4,28 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 
 interface ChatQueryProps {
   queryKey: string;
-  paramKey: "channelId" | "conversationId";
+  apiUrl: string;
+  paramKey: "channels" | "conversations";
   paramValue: string;
 }
 
 export const useChatQuery = ({
   queryKey,
+  apiUrl,
   paramKey,
   paramValue,
 }: ChatQueryProps) => {
   const { isConnected } = useSocket();
 
   const fetchMessages = async ({ pageParam = undefined }) => {
-    const response = await axiosInstance.get(`/api/messages`, {
-      params: {
-        cursor: pageParam,
-        [paramKey]: paramValue,
+    const response = await axiosInstance.get(
+      `${apiUrl}/${paramKey}/${paramValue}`,
+      {
+        params: {
+          cursor: pageParam,
+        },
       },
-    });
+    );
 
     return response.data;
   };

@@ -39,25 +39,26 @@ const ChannelIdPage = () => {
       {channel && (
         <>
           <ChatHeader
+            type="channel"
             serverId={channel?.serverId}
             name={channel?.name}
-            type="channel"
           />
           <ChatMessages
-            member={member}
-            name={channel.name}
-            chatId={channel.id}
             type="channel"
+            chatId={channel.id}
+            name={channel.name}
+            member={member}
+            apiUrl="/api/messages"
+            paramKey="channels"
+            paramValue={channel.id}
             body={{
               channelId: channel.id,
               serverId: channel.serverId,
             }}
-            paramKey="channelId"
-            paramValue={channel.id}
           />
           <ChatInput
-            name={channel.name}
             type="channel"
+            name={channel.name}
             apiUrl="/api/socket/messages"
             body={{
               channelId: channel.id,

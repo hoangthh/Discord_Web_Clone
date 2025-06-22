@@ -1,42 +1,44 @@
 "use client";
 
-import {
-  Member,
-  MemberWithProfile,
-  MessageWithMemberWithProfile,
-} from "@/models";
-import { ChatWelcome } from "@/components/chats";
+import { ChatItem, ChatWelcome } from "@/components/chats";
 import { useChatQuery } from "@/hooks";
+import { MemberWithProfile, MessageWithMemberWithProfile } from "@/models";
+import { format } from "date-fns";
 import { Loader2, ServerCrash } from "lucide-react";
 import { Fragment } from "react";
 
+const DATE_FORMAT = "d MMM yyyy, HH:mm";
+
 interface ChatMessagesProps {
+  type: "channel" | "conversation";
+  chatId: string;
   name: string;
   member: MemberWithProfile | undefined;
-  chatId: string;
+  apiUrl: string;
+  paramKey: "channels" | "conversations";
+  paramValue: string;
   body: {
     channelId: string;
     serverId: string;
   };
-  paramKey: "channelId" | "conversationId";
-  paramValue: string;
-  type: "channel" | "conversation";
 }
 
 export const ChatMessages = ({
+  type,
+  chatId,
   name,
   member,
-  chatId,
-  body,
+  apiUrl,
   paramKey,
   paramValue,
-  type,
+  body,
 }: ChatMessagesProps) => {
   const queryKey = `chat:${chatId}`;
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } =
     useChatQuery({
       queryKey,
+      apiUrl,
       paramKey,
       paramValue,
     });
@@ -72,7 +74,21 @@ export const ChatMessages = ({
         {data?.pages?.map((group, index) => (
           <Fragment key={index}>
             {group.items.map((message: MessageWithMemberWithProfile) => (
-              <div key={message?.id}>{message.content}</div>
+              <ChatItem
+                key={message.id}
+                messageId={message.id}
+                currentMember={member}
+                member={message.member}
+                content={message.content}
+                fileUrl={message.fileUrl}
+                deleted={message.deleted}
+                timestamp={format(new Date(message.createdAt), DATE_FORMAT)}
+                isUpdated={message.updatedAt !== message.createdAt}
+                socketUrl="/api/socket"
+                paramKey="messages"
+                paramValue={message.id}
+                body={body}
+              />
             ))}
           </Fragment>
         ))}
