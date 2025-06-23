@@ -29,7 +29,55 @@ export const useMessage = () => {
     }
   };
 
+  const editMessage = async ({
+    messageId,
+    content,
+    channelId,
+    serverId,
+  }: {
+    messageId: string;
+    content: string;
+    channelId?: string;
+    serverId?: string;
+  }) => {
+    if (content === "" || !channelId || !serverId) return;
+    try {
+      await axiosInstance.patch(`/api/socket/messages/${messageId}`, {
+        content,
+        channelId,
+        serverId,
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const deleteMessage = async ({
+    apiUrl,
+    channelId,
+    serverId,
+  }: {
+    apiUrl: string;
+    channelId?: string;
+    serverId?: string;
+  }) => {
+    if (!channelId || !serverId) return;
+
+    try {
+      await axiosInstance.delete(`${apiUrl}`, {
+        params: {
+          channelId,
+          serverId,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return {
     createMessage,
+    editMessage,
+    deleteMessage,
   };
 };

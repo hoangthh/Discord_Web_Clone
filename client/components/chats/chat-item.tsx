@@ -1,12 +1,11 @@
 "use client";
 
-import { axiosInstance } from "@/api-client";
 import { ActionTooltip } from "@/components/action-tooltip";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { UserAvatar } from "@/components/user-avatar";
-import { useModal } from "@/hooks";
+import { useDirectMessage, useMessage, useModal } from "@/hooks";
 import { cn } from "@/lib/utils";
 import { MemberWithProfile, Role } from "@/models";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -18,7 +17,6 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 
 interface ChatItemProps {
-  messageId: string;
   content: string;
   member: MemberWithProfile;
   timestamp: string;
@@ -26,16 +24,17 @@ interface ChatItemProps {
   deleted: boolean;
   currentMember: MemberWithProfile | undefined;
   isUpdated: boolean;
-  socketUrl: string;
-  paramKey: "messages" | "conversations";
   paramValue: string;
+  socketUrl: string;
   socketQuery: {
-    channelId: string;
-    serverId: string;
+    channelId?: string;
+    serverId?: string;
+    conversationId?: string;
   };
   socketBody: {
-    channelId: string;
-    serverId: string;
+    channelId?: string;
+    serverId?: string;
+    conversationId?: string;
   };
 }
 
@@ -54,7 +53,6 @@ const formSchema = z.object({
 });
 
 export const ChatItem = ({
-  messageId,
   content,
   member,
   timestamp,
@@ -63,15 +61,16 @@ export const ChatItem = ({
   currentMember,
   isUpdated,
   socketUrl,
-  paramKey,
   paramValue,
   socketQuery,
   socketBody,
 }: ChatItemProps) => {
-  const [isEditing, setIsEditing] = useState(false);
-  const { onOpen } = useModal();
   const params = useParams<{ serverId: string }>();
   const router = useRouter();
+  const [isEditing, setIsEditing] = useState(false);
+  const { onOpen } = useModal();
+  const { editMessage } = useMessage();
+  const { editDirectMessage } = useDirectMessage();
 
   const onMemberClick = () => {
     if (!currentMember) return;
@@ -81,7 +80,7 @@ export const ChatItem = ({
   };
 
   useEffect(() => {
-    const handleKeyDown = (event: any) => {
+    const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape" || event.keyCode === 27) setIsEditing(false);
     };
 
@@ -101,11 +100,22 @@ export const ChatItem = ({
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      await axiosInstance.patch(`${socketUrl}/${paramKey}/${paramValue}`, {
-        content: values.content,
-        channelId: socketBody.channelId,
-        serverId: socketBody.serverId,
-      });
+      if (!content || content === "") return;
+
+      if (socketUrl === `/api/socket/messages`) {
+        await editMessage({
+          messageId: paramValue,
+          content: values.content,
+          channelId: socketBody.channelId,
+          serverId: socketBody.serverId,
+        });
+      } else if (socketUrl === `/api/socket/direct-messages`) {
+        await editDirectMessage({
+          directMessageId: paramValue,
+          content: values.content,
+          conversationId: socketBody.conversationId,
+        });
+      }
 
       form.reset();
       setIsEditing(false);
@@ -233,7 +243,7 @@ export const ChatItem = ({
             <Trash
               onClick={() =>
                 onOpen("deleteMessage", {
-                  apiUrl: `${socketUrl}/${paramKey}/${paramValue}`,
+                  apiUrl: `${socketUrl}/${paramValue}`,
                   query: socketQuery,
                 })
               }

@@ -51,6 +51,7 @@ const ChannelIdPage = () => {
             apiUrl="/api/messages"
             paramKey="channels"
             paramValue={channel.id}
+            socketUrl="/api/socket/messages"
             socketQuery={{
               channelId: channel.id,
               serverId: channel.serverId,

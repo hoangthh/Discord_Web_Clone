@@ -3,7 +3,7 @@
 import EmojiPicker from "@/components/emoji-picker";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useMessage, useModal } from "@/hooks";
+import { useDirectMessage, useMessage, useModal } from "@/hooks";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -11,20 +11,21 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 
 interface ChatInputProps {
-  apiUrl: string;
-  body: { channelId: string; serverId: string };
-  name: string;
   type: "conversation" | "channel";
+  name: string;
+  apiUrl: string;
+  body: { channelId?: string; serverId?: string; conversationId?: string };
 }
 
 const formSchema = z.object({
   content: z.string().min(1),
 });
 
-export const ChatInput = ({ apiUrl, body, name, type }: ChatInputProps) => {
+export const ChatInput = ({ type, name, apiUrl, body }: ChatInputProps) => {
   const router = useRouter();
   const { onOpen } = useModal();
   const { createMessage } = useMessage();
+  const { createDirectMessage } = useDirectMessage();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -37,11 +38,18 @@ export const ChatInput = ({ apiUrl, body, name, type }: ChatInputProps) => {
 
   const onSubmit = async (value: z.infer<typeof formSchema>) => {
     try {
-      await createMessage({
-        content: value.content,
-        channelId: body.channelId,
-        serverId: body.serverId,
-      });
+      if (apiUrl === `/api/socket/messages`) {
+        await createMessage({
+          content: value.content,
+          channelId: body.channelId,
+          serverId: body.serverId,
+        });
+      } else if (apiUrl === `/api/socket/direct-messages`) {
+        await createDirectMessage({
+          content: value.content,
+          conversationId: body.conversationId,
+        });
+      }
 
       form.reset();
       router.refresh();

@@ -17,13 +17,16 @@ interface ChatMessagesProps {
   apiUrl: string;
   paramKey: "channels" | "conversations";
   paramValue: string;
+  socketUrl: string;
   socketQuery: {
-    channelId: string;
-    serverId: string;
+    channelId?: string;
+    serverId?: string;
+    conversationId?: string;
   };
   socketBody: {
-    channelId: string;
-    serverId: string;
+    channelId?: string;
+    serverId?: string;
+    conversationId?: string;
   };
 }
 
@@ -35,6 +38,7 @@ export const ChatMessages = ({
   apiUrl,
   paramKey,
   paramValue,
+  socketUrl,
   socketQuery,
   socketBody,
 }: ChatMessagesProps) => {
@@ -107,7 +111,6 @@ export const ChatMessages = ({
             {group.items.map((message: MessageWithMemberWithProfile) => (
               <ChatItem
                 key={message.id}
-                messageId={message.id}
                 currentMember={member}
                 member={message.member}
                 content={message.content}
@@ -115,8 +118,7 @@ export const ChatMessages = ({
                 deleted={message.deleted}
                 timestamp={format(new Date(message.createdAt), DATE_FORMAT)}
                 isUpdated={message.updatedAt !== message.createdAt}
-                socketUrl="/api/socket"
-                paramKey="messages"
+                socketUrl={socketUrl}
                 paramValue={message.id}
                 socketQuery={socketQuery}
                 socketBody={socketBody}

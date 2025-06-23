@@ -5,6 +5,7 @@ export * from "./use-chat-query";
 export * from "./use-chat-scroll";
 export * from "./use-chat-socket";
 export * from "./use-conversation";
+export * from "./use-direct-message";
 export * from "./use-first-member-by-server-id-if-member";
 export * from "./use-message";
 export * from "./use-modal-store";

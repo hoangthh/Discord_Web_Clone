@@ -8,13 +8,17 @@ export const useConversation = (
   memberTwoId: string,
   options?: Partial<SWRConfiguration<Conversation>>,
 ) => {
+  const shouldFetch = !!memberOneId && !!memberTwoId;
+
   const {
     data: conversation,
     error,
     isLoading,
     mutate,
   } = useSWR<Conversation>(
-    `/api/conversations/member-one/${memberOneId}/member-two/${memberTwoId}`,
+    shouldFetch
+      ? `/api/conversations/member-one/${memberOneId}/member-two/${memberTwoId}`
+      : null,
     {
       ...options,
     },

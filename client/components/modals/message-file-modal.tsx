@@ -17,7 +17,7 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-import { useMessage, useModal } from "@/hooks";
+import { useDirectMessage, useMessage, useModal } from "@/hooks";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -34,11 +34,12 @@ const formSchema = z.object({
 
 export const MessageFileModal = () => {
   const router = useRouter();
-  const { createMessage } = useMessage();
   const { isOpen, onClose, type, data } = useModal();
+  const { createMessage } = useMessage();
+  const { createDirectMessage } = useDirectMessage();
 
   const isModalOpen = isOpen && type === "messageFile";
-  const { body } = data;
+  const { apiUrl, body } = data;
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -57,11 +58,18 @@ export const MessageFileModal = () => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (!body) return;
 
-    await createMessage({
-      image: values.image,
-      channelId: body.channelId,
-      serverId: body.serverId,
-    });
+    if (apiUrl === `/api/socket/messages`) {
+      await createMessage({
+        image: values.image,
+        channelId: body.channelId,
+        serverId: body.serverId,
+      });
+    } else if (apiUrl === `/api/socket/direct-messages`) {
+      await createDirectMessage({
+        image: values.image,
+        conversationId: body.conversationId,
+      });
+    }
 
     form.reset();
     router.refresh();

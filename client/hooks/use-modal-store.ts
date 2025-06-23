@@ -26,12 +26,14 @@ interface ModalData {
   channelType?: ChannelTypeEnum | string;
   apiUrl?: string;
   query?: {
-    channelId: string;
-    serverId: string;
+    channelId?: string;
+    serverId?: string;
+    conversationId?: string;
   };
   body?: {
-    channelId: string;
-    serverId: string;
+    channelId?: string;
+    serverId?: string;
+    conversationId?: string;
   };
   mutateServerByServerId?: KeyedMutator<ServerWithChannelWithMember>;
 }

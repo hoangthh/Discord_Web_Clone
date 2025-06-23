@@ -1,6 +1,6 @@
 "use client";
 
-import { ChatHeader } from "@/components/chats";
+import { ChatHeader, ChatInput, ChatMessages } from "@/components/chats";
 import {
   useAuth,
   useConversation,
@@ -44,12 +44,42 @@ const MemberIdPage = () => {
   return (
     <div className="flex h-full flex-col bg-white dark:bg-[#313338]">
       {otherMember && (
-        <ChatHeader
-          serverId={params.serverId}
-          name={otherMember?.profile.name}
-          type="conversation"
-          imageUrl={otherMember?.profile.imageUrl}
-        />
+        <>
+          <ChatHeader
+            serverId={params.serverId}
+            name={otherMember?.profile.name}
+            type="conversation"
+            imageUrl={otherMember?.profile.imageUrl}
+          />
+          {conversation && (
+            <>
+              <ChatMessages
+                type="conversation"
+                chatId={conversation?.id}
+                name={otherMember.profile.name}
+                member={currentMember}
+                apiUrl="/api/direct-messages"
+                paramKey="conversations"
+                paramValue={conversation.id}
+                socketUrl="/api/socket/direct-messages"
+                socketQuery={{
+                  conversationId: conversation.id,
+                }}
+                socketBody={{
+                  conversationId: conversation.id,
+                }}
+              />
+              <ChatInput
+                type="conversation"
+                name={otherMember.profile.name}
+                apiUrl="/api/socket/direct-messages"
+                body={{
+                  conversationId: conversation.id,
+                }}
+              />
+            </>
+          )}
+        </>
       )}
     </div>
   );
