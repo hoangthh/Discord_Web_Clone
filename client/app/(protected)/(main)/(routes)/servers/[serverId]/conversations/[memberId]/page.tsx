@@ -1,16 +1,19 @@
 "use client";
 
 import { ChatHeader, ChatInput, ChatMessages } from "@/components/chats";
+import { MediaRoom } from "@/components/media-room";
 import {
   useAuth,
   useConversation,
   useFirstMemberByServerIdIfMember,
 } from "@/hooks";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 
 const MemberIdPage = () => {
   const params = useParams<{ memberId: string; serverId: string }>();
+  const searchParams = useSearchParams();
+  const video = searchParams.get("video");
   const router = useRouter();
   const { profile, isLoading: profileLoading } = useAuth();
   const { member: currentMember, isLoading: memberLoading } =
@@ -53,30 +56,37 @@ const MemberIdPage = () => {
           />
           {conversation && (
             <>
-              <ChatMessages
-                type="conversation"
-                chatId={conversation?.id}
-                name={otherMember.profile.name}
-                member={currentMember}
-                apiUrl="/api/direct-messages"
-                paramKey="conversations"
-                paramValue={conversation.id}
-                socketUrl="/api/socket/direct-messages"
-                socketQuery={{
-                  conversationId: conversation.id,
-                }}
-                socketBody={{
-                  conversationId: conversation.id,
-                }}
-              />
-              <ChatInput
-                type="conversation"
-                name={otherMember.profile.name}
-                apiUrl="/api/socket/direct-messages"
-                body={{
-                  conversationId: conversation.id,
-                }}
-              />
+              {video && (
+                <MediaRoom chatId={conversation.id} audio={true} video={true} />
+              )}
+              {!video && (
+                <>
+                  <ChatMessages
+                    type="conversation"
+                    chatId={conversation?.id}
+                    name={otherMember.profile.name}
+                    member={currentMember}
+                    apiUrl="/api/direct-messages"
+                    paramKey="conversations"
+                    paramValue={conversation.id}
+                    socketUrl="/api/socket/direct-messages"
+                    socketQuery={{
+                      conversationId: conversation.id,
+                    }}
+                    socketBody={{
+                      conversationId: conversation.id,
+                    }}
+                  />
+                  <ChatInput
+                    type="conversation"
+                    name={otherMember.profile.name}
+                    apiUrl="/api/socket/direct-messages"
+                    body={{
+                      conversationId: conversation.id,
+                    }}
+                  />
+                </>
+              )}
             </>
           )}
         </>
