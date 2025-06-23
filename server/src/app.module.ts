@@ -9,6 +9,7 @@ import { MemberModule } from './member/member.module';
 import { ConversationModule } from './conversation/conversation.module';
 import { SocketModule } from './socket/socket.module';
 import { MessageModule } from './message/message.module';
+import { DirectMessageModule } from './direct-message/direct-message.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { MessageModule } from './message/message.module';
     ConversationModule,
     SocketModule,
     MessageModule,
+    DirectMessageModule,
   ],
   controllers: [],
   providers: [],

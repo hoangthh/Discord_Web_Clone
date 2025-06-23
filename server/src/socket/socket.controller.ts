@@ -16,6 +16,7 @@ import { memoryStorage } from 'multer';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { UpdateMessageDto } from './dto/update-message.dto';
 import { SocketGateway } from './socket.gateway';
+import { UpdateDirectMessageDto } from './dto/update-direct-message.dto';
 
 interface UpdateMessageBody {
   content: string;
@@ -23,7 +24,16 @@ interface UpdateMessageBody {
   serverId: string;
 }
 
+interface UpdateDirectMessageBody {
+  content: string;
+  conversationId: string;
+}
+
 interface CreateMessageBody extends UpdateMessageBody {
+  fileUrl: string;
+}
+
+interface CreateDirectMessageBody extends UpdateDirectMessageBody {
   fileUrl: string;
 }
 
@@ -53,6 +63,20 @@ export class SocketController {
     });
   }
 
+  @Patch('direct-messages/:directMessageId')
+  editDirectMessageByDirectMessageId(
+    @Param('directMessageId') directMessageId: string,
+    @Body() body: UpdateDirectMessageDto,
+    @Req() req: RequestWithProfileId,
+  ) {
+    return this.socketGateway.editDirectMessageByDirectMessageId({
+      content: body.content,
+      directMessageId,
+      conversationId: body.conversationId,
+      profileId: req.profile.profileId,
+    });
+  }
+
   @Delete('messages/:messageId')
   deleteMessageByMessageId(
     @Param('messageId') messageId: string,
@@ -64,6 +88,19 @@ export class SocketController {
       messageId,
       channelId,
       serverId,
+      profileId: req.profile.profileId,
+    });
+  }
+
+  @Delete('direct-messages/:directMessageId')
+  deleteDirectMessageByDirectMessageId(
+    @Param('directMessageId') directMessageId: string,
+    @Query('conversationId') conversationId: string,
+    @Req() req: RequestWithProfileId,
+  ) {
+    return this.socketGateway.deleteDirectMessageByDirectMessageId({
+      directMessageId,
+      conversationId,
       profileId: req.profile.profileId,
     });
   }
@@ -85,6 +122,26 @@ export class SocketController {
       image,
       channelId: body.channelId,
       serverId: body.serverId,
+      profileId: req.profile.profileId,
+    });
+  }
+
+  @Post('direct-messages')
+  @Post()
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage: memoryStorage(),
+    }),
+  )
+  createDirectMessage(
+    @UploadedFile() image: Express.Multer.File,
+    @Body() body: CreateDirectMessageBody,
+    @Req() req: RequestWithProfileId,
+  ) {
+    return this.socketGateway.createDirectMessage({
+      content: body.content,
+      image,
+      conversationId: body.conversationId,
       profileId: req.profile.profileId,
     });
   }

@@ -11,6 +11,8 @@ import {
 import { MemberRole } from '@prisma/client';
 import { Server, Socket } from 'socket.io';
 import { ChannelService } from 'src/channel/channel.service';
+import { ConversationService } from 'src/conversation/conversation.service';
+import { DirectMessageService } from 'src/direct-message/direct-message.service';
 import { MessageService } from 'src/message/message.service';
 import { ServerService } from 'src/server/server.service';
 import { CloudinaryService } from 'src/services/cloudinary/cloudinary.service';
@@ -31,6 +33,8 @@ export class SocketGateway
     private serverService: ServerService,
     private channelService: ChannelService,
     private messageService: MessageService,
+    private conversationService: ConversationService,
+    private directMessageService: DirectMessageService,
   ) {}
 
   afterInit() {
@@ -71,6 +75,32 @@ export class SocketGateway
     const member = server.members.find(
       (member) => member.profileId === profileId,
     );
+
+    if (!member) throw new NotFoundException({ error: 'Member not found' });
+
+    return member;
+  };
+
+  validateDirectMessage = async ({
+    conversationId,
+    profileId,
+  }: {
+    conversationId: string;
+    profileId: string;
+  }) => {
+    const conversation =
+      await this.conversationService.findFirstConversationSocket({
+        conversationId,
+        profileId,
+      });
+
+    if (!conversation)
+      throw new NotFoundException({ error: 'Conversation not found' });
+
+    const member =
+      conversation.memberOne.profileId === profileId
+        ? conversation.memberOne
+        : conversation.memberTwo;
 
     if (!member) throw new NotFoundException({ error: 'Member not found' });
 
@@ -125,6 +155,52 @@ export class SocketGateway
     return message;
   }
 
+  async editDirectMessageByDirectMessageId({
+    content,
+    directMessageId,
+    conversationId,
+    profileId,
+  }: {
+    content: string;
+    directMessageId: string;
+    conversationId: string;
+    profileId: string;
+  }) {
+    const member = await this.validateDirectMessage({
+      conversationId,
+      profileId,
+    });
+
+    let message = await this.directMessageService.findFirstDirectMessageSocket({
+      directMessageId,
+      conversationId,
+    });
+
+    if (!message || message.deleted)
+      throw new NotFoundException({ error: 'Message not found' });
+
+    const isMessageOwner = message.memberId === member.id;
+    const isAdmin = member.role === MemberRole.ADMIN;
+    const isModerator = member.role === MemberRole.MODERATOR;
+    const canModify = isMessageOwner || isAdmin || isModerator;
+
+    if (!canModify) throw new UnauthorizedException({ error: 'Unauthorized' });
+    if (!isMessageOwner)
+      throw new UnauthorizedException({ error: 'Unauthorized' });
+
+    message =
+      await this.directMessageService.editDirectMessageByDirectMessageIdSocket({
+        directMessageId,
+        content,
+      });
+
+    const updateKey = `chat:${conversationId}:messages:update`;
+
+    this.server.emit(updateKey, message);
+
+    return message;
+  }
+
   async deleteMessageByMessageId({
     messageId,
     channelId,
@@ -167,6 +243,47 @@ export class SocketGateway
     return message;
   }
 
+  async deleteDirectMessageByDirectMessageId({
+    directMessageId,
+    conversationId,
+    profileId,
+  }: {
+    directMessageId: string;
+    conversationId: string;
+    profileId: string;
+  }) {
+    const member = await this.validateDirectMessage({
+      conversationId,
+      profileId,
+    });
+
+    let message = await this.directMessageService.findFirstDirectMessageSocket({
+      directMessageId,
+      conversationId,
+    });
+
+    if (!message || message.deleted)
+      throw new NotFoundException({ error: 'Message not found' });
+
+    const isMessageOwner = message.memberId === member.id;
+    const isAdmin = member.role === MemberRole.ADMIN;
+    const isModerator = member.role === MemberRole.MODERATOR;
+    const canModify = isMessageOwner || isAdmin || isModerator;
+
+    if (!canModify) throw new UnauthorizedException({ error: 'Unauthorized' });
+
+    message =
+      await this.directMessageService.deleteDirectMessageByDirectMessageIdSocket(
+        directMessageId,
+      );
+
+    const updateKey = `chat:${conversationId}:messages:update`;
+
+    this.server.emit(updateKey, message);
+
+    return message;
+  }
+
   async createMessage({
     content,
     image,
@@ -198,6 +315,40 @@ export class SocketGateway
     });
 
     const channelKey = `chat:${channelId}:messages`;
+
+    this.server.emit(channelKey, message);
+
+    return message;
+  }
+
+  async createDirectMessage({
+    content,
+    image,
+    conversationId,
+    profileId,
+  }: {
+    content: string;
+    image: Express.Multer.File;
+    conversationId: string;
+    profileId: string;
+  }) {
+    const member = await this.validateDirectMessage({
+      conversationId,
+      profileId,
+    });
+
+    let cloudinaryUrl = '';
+    if (image)
+      cloudinaryUrl = await this.cloudinaryService.uploadFile(image.buffer);
+
+    const message = await this.directMessageService.createDirectMessageSocket({
+      content,
+      fileUrl: cloudinaryUrl,
+      conversationId,
+      memberId: member.id,
+    });
+
+    const channelKey = `chat:${conversationId}:messages`;
 
     this.server.emit(channelKey, message);
 

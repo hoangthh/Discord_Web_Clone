@@ -56,4 +56,44 @@ export class ConversationService {
       },
     });
   }
+
+  async findFirstConversationSocket({
+    conversationId,
+    profileId,
+  }: {
+    conversationId: string;
+    profileId: string;
+  }) {
+    const conversation = this.prisma.conversation.findFirst({
+      where: {
+        id: conversationId,
+        OR: [
+          {
+            memberOne: {
+              profileId,
+            },
+          },
+          {
+            memberTwo: {
+              profileId,
+            },
+          },
+        ],
+      },
+      include: {
+        memberOne: {
+          include: {
+            profile: true,
+          },
+        },
+        memberTwo: {
+          include: {
+            profile: true,
+          },
+        },
+      },
+    });
+
+    return conversation;
+  }
 }

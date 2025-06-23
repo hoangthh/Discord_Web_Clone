@@ -4,6 +4,7 @@ import { ConversationService } from './conversation.service';
 
 @Module({
   controllers: [ConversationController],
-  providers: [ConversationService]
+  providers: [ConversationService],
+  exports: [ConversationService],
 })
 export class ConversationModule {}
