@@ -13,7 +13,7 @@ const ServerIdPage = () => {
   const { server, isLoading: serverLoading } =
     useServerWithGeneralChannelByServerId(params.serverId);
 
-  const initialChannel = server?.channels[0];
+  const initialChannel = server?.channels?.[0] ?? null;
 
   useEffect(() => {
     if (profileLoading || serverLoading) return;
