@@ -8,7 +8,6 @@ import { UserAvatar } from "@/components/user-avatar";
 
 interface ServerMemberProps {
   member: MemberWithProfile;
-  server: Server;
 }
 
 const roleIconMap = {
@@ -17,7 +16,7 @@ const roleIconMap = {
   [Role.ADMIN]: <ShieldAlert className="ml-2 h-4 w-4 text-rose-500" />,
 };
 
-export const ServerMember = ({ member, server }: ServerMemberProps) => {
+export const ServerMember = ({ member }: ServerMemberProps) => {
   const params = useParams<{ memberId: string; serverId: string }>();
   const router = useRouter();
 

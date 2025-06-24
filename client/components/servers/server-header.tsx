@@ -35,7 +35,6 @@ export const ServerHeader = ({
 
   const isAdmin = role === Role.ADMIN;
   const isModerator = isAdmin || role === Role.MODERATOR;
-  const isGuest = role === Role.GUEST;
 
   return (
     <div>

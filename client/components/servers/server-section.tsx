@@ -1,15 +1,14 @@
 "use client";
 
+import { useModal } from "@/hooks";
 import {
-  Channel,
   ChannelTypeEnum,
   MemberRole,
   Role,
   ServerWithChannelWithMember,
 } from "@/models";
-import { ActionTooltip } from "../action-tooltip";
 import { Plus, Settings } from "lucide-react";
-import { useModal } from "@/hooks";
+import { ActionTooltip } from "../action-tooltip";
 
 interface ServerSectionProps {
   label: string;

@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuth } from "@/hooks";
-import { Loader2, LoaderCircle, LoaderCircleIcon } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
