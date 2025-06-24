@@ -1,5 +1,5 @@
 // src/auth/auth.controller.ts
-import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
@@ -51,9 +51,21 @@ export class AuthController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('/profile')
+  @Get('profile')
   getProfile(@Req() req: RequestWithProfile) {
     const profileId = req.profile.profileId;
     return this.profileService.getProfileById(profileId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('logout')
+  logout(@Res({ passthrough: true }) res: Response) {
+    res.clearCookie('token', {
+      httpOnly: true,
+      sameSite: 'none',
+      secure: true,
+    });
+
+    return { message: 'Logout successfully' };
   }
 }
