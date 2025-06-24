@@ -1,13 +1,12 @@
 "use client";
 
-import { useAuth, useServers } from "@/hooks";
-import { useRouter } from "next/navigation";
-
+import { AvatarOptions } from "@/components/avatar-options";
 import { ModeToggle } from "@/components/mode-toggle";
+import { NavigationAction, NavigationItem } from "@/components/navigations";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { NavigationAction } from "./navigation-action";
-import { NavigationItem } from "./navigation-item";
+import { useAuth, useServers } from "@/hooks";
+import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 export const NavigationSidebar = () => {
@@ -20,6 +19,7 @@ export const NavigationSidebar = () => {
       router.replace("/");
     }
   }, [profile, router]);
+
   return (
     <div className="text-primary flex h-full w-full flex-col items-center space-y-4 bg-[#E3E5E8] py-3 dark:bg-[#1E1F22]">
       <NavigationAction />
@@ -39,6 +39,7 @@ export const NavigationSidebar = () => {
         )}
       </ScrollArea>
       <div className="mt-auto flex flex-col items-center gap-y-4 pb-3">
+        <AvatarOptions profile={profile} />
         <ModeToggle />
       </div>
     </div>

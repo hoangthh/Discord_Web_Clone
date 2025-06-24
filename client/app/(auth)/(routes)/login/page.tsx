@@ -17,7 +17,7 @@ const LoginPage = () => {
 
   return (
     <div className="relative flex h-screen w-screen items-center justify-center">
-      <div className="absolute z-[-1] h-full w-full">
+      <div className="absolute z-[-1] hidden h-full w-full md:block">
         <Image fill src={"/login-background.webp"} alt="background" />
       </div>
 
@@ -32,9 +32,9 @@ const LoginPage = () => {
       </div>
 
       <Dialog open>
-        <DialogContent className="overflow-hidden rounded-xl bg-[#313338] p-0 text-white md:min-w-2xl">
+        <DialogContent className="mx-5 overflow-hidden rounded-xl bg-[white] p-0 text-white md:min-w-2xl md:bg-[#313338]">
           <DialogHeader className="px-6 pt-8">
-            <DialogTitle className="text-center text-2xl font-bold">
+            <DialogTitle className="text-center text-2xl font-bold text-black md:text-white">
               Login to Discord
             </DialogTitle>
             <DialogDescription className="text-center text-zinc-500">
@@ -43,7 +43,7 @@ const LoginPage = () => {
           </DialogHeader>
 
           <Button
-            className="m-auto mt-4 ml-5 cursor-pointer bg-white text-black hover:text-white"
+            className="m-auto mt-4 ml-5 flex cursor-pointer items-center border-1 border-black bg-white text-black hover:text-white"
             variant={"primary"}
             onClick={handleLoginGoogle}
           >
@@ -65,7 +65,7 @@ const LoginPage = () => {
                 alt="discord"
               />
               <a href="https://github.com/hoangthh/Discord_Web_Clone">
-                Visit my Github
+                <p className="text-black md:text-white">Visit my Github</p>
               </a>
             </Button>
           </DialogFooter>
