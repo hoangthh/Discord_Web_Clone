@@ -41,9 +41,9 @@ export const useServers = (options?: Partial<SWRConfiguration<Server[]>>) => {
   }: {
     inviteCode: string;
     profileId: string;
-  }) => {
+  }): Promise<Server | undefined> => {
     try {
-      const server: Server = await axiosInstance.post(
+      const response = await axiosInstance.post(
         `/api/servers/${inviteCode}/member`,
         {
           profileId,
@@ -52,7 +52,7 @@ export const useServers = (options?: Partial<SWRConfiguration<Server[]>>) => {
 
       await mutate();
 
-      return server;
+      return response.data;
     } catch (error) {
       console.log(error);
     }

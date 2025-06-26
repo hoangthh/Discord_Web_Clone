@@ -9,18 +9,17 @@ type Params = {
 };
 
 const InviteCodePage = () => {
-  const { profile, isLoading } = useAuth();
   const router = useRouter();
   const params = useParams<Params>();
-  const { joinServer } = useServers();
   const hasJoinedRef = useRef(false);
+  const { profile, isLoading } = useAuth();
+  const { joinServer } = useServers();
 
-  const { server: existingServer } = useServerByInviteCodeIfMember(
-    params.inviteCode,
-  );
+  const { server: existingServer, isLoading: existingServerLoading } =
+    useServerByInviteCodeIfMember(params.inviteCode);
 
   useEffect(() => {
-    if (isLoading) return;
+    if (isLoading || existingServerLoading) return;
     if (!profile) return router.replace("/login");
     if (!params.inviteCode) return router.replace("/");
     if (existingServer) {
@@ -40,6 +39,7 @@ const InviteCodePage = () => {
     }
   }, [
     isLoading,
+    existingServerLoading,
     profile,
     router,
     params.inviteCode,
