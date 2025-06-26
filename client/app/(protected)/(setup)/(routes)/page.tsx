@@ -2,6 +2,7 @@
 
 import { InitialModal } from "@/components/modals";
 import { useAuth, useServerByProfileId } from "@/hooks";
+import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
@@ -16,13 +17,10 @@ const SetupPage = () => {
     if (server) router.replace(`/servers/${server.id}`);
   }, [router, server]);
 
-  if (profileLoading || serverLoading || server) return;
+  if (profileLoading || serverLoading || server)
+    return <Loader2 className="animate-spin" />;
 
-  return (
-    <div>
-      <InitialModal />
-    </div>
-  );
+  return <InitialModal />;
 };
 
 export default SetupPage;

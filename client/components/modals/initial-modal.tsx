@@ -6,7 +6,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -26,7 +25,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
-const formSchema = z.object({
+const customServerFormSchema = z.object({
   name: z.string().min(1, {
     message: "Server name is required",
   }),
@@ -38,31 +37,53 @@ const formSchema = z.object({
   ]),
 });
 
+const joinServerFormSchema = z.object({
+  inviteLink: z.string().min(1, {
+    message: "Invite link is required",
+  }),
+});
+
 export const InitialModal = () => {
+  const [isMounted, setIsMounted] = useState(false);
   const router = useRouter();
   const { createServer } = useServers();
-  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  const form = useForm({
-    resolver: zodResolver(formSchema),
+  const customServerForm = useForm({
+    resolver: zodResolver(customServerFormSchema),
     defaultValues: {
       name: "",
       image: "",
     },
   });
 
-  const isLoading = form.formState.isSubmitting;
+  const joinServerForm = useForm({
+    resolver: zodResolver(joinServerFormSchema),
+    defaultValues: {
+      inviteLink: "",
+    },
+  });
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const customServerIsLoading = customServerForm.formState.isSubmitting;
+  const joinServerIsLoading = customServerForm.formState.isSubmitting;
+
+  const customServerOnSubmit = async (
+    values: z.infer<typeof customServerFormSchema>,
+  ) => {
     await createServer({ name: values.name, image: values.image });
 
-    form.reset();
+    customServerForm.reset();
     router.refresh();
     window.location.reload();
+  };
+
+  const joinServerOnSubmit = async (
+    values: z.infer<typeof joinServerFormSchema>,
+  ) => {
+    router.push(values.inviteLink);
   };
 
   if (!isMounted) return null;
@@ -79,12 +100,15 @@ export const InitialModal = () => {
             always change it later
           </DialogDescription>
         </DialogHeader>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <Form {...customServerForm}>
+          <form
+            onSubmit={customServerForm.handleSubmit(customServerOnSubmit)}
+            className="space-y-8"
+          >
             <div className="space-y-8 px-6">
               <div className="flex items-center justify-center text-center">
                 <FormField
-                  control={form.control}
+                  control={customServerForm.control}
                   name="image"
                   render={({ field }) => (
                     <FormItem>
@@ -101,35 +125,70 @@ export const InitialModal = () => {
               </div>
 
               <FormField
-                control={form.control}
+                control={customServerForm.control}
                 name="name"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="dark:text-secondary/70 text-xs font-bold text-zinc-500 uppercase">
                       Server Name
                     </FormLabel>
-                    <FormControl>
-                      <Input
-                        disabled={isLoading}
-                        className="border-0 bg-zinc-300/50 text-black focus-visible:ring-0 focus-visible:ring-offset-0"
-                        placeholder="Enter a server name"
-                        {...field}
-                      />
-                    </FormControl>
+                    <div className="flex select-none">
+                      <FormControl>
+                        <Input
+                          disabled={customServerIsLoading}
+                          className="border-0 bg-zinc-300/50 text-black focus-visible:ring-0 focus-visible:ring-offset-0"
+                          placeholder="Enter a server name"
+                          {...field}
+                        />
+                      </FormControl>
+                      <Button
+                        className="cursor-pointer"
+                        variant={"primary"}
+                        disabled={customServerIsLoading}
+                      >
+                        Create
+                      </Button>
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}
               />
             </div>
-            <DialogFooter className="bg-gray-100 px-6 py-4">
-              <Button
-                className="cursor-pointer"
-                variant={"primary"}
-                disabled={isLoading}
-              >
-                Create
-              </Button>
-            </DialogFooter>
+          </form>
+        </Form>
+
+        <Form {...joinServerForm}>
+          <form onSubmit={joinServerForm.handleSubmit(joinServerOnSubmit)}>
+            <div className="bg-gray-100 px-6 py-4">
+              <FormField
+                control={joinServerForm.control}
+                name="inviteLink"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="dark:text-secondary/70 text-xs font-bold text-zinc-500 uppercase">
+                      Or Join Other Server By Invite Link
+                    </FormLabel>
+                    <div className="flex select-none">
+                      <FormControl>
+                        <Input
+                          disabled={joinServerIsLoading}
+                          className="border-0 bg-zinc-300/50 text-black focus-visible:ring-0 focus-visible:ring-offset-0"
+                          placeholder="Enter a server invite link"
+                          {...field}
+                        />
+                      </FormControl>
+                      <Button
+                        className="cursor-pointer"
+                        disabled={joinServerIsLoading}
+                      >
+                        Join
+                      </Button>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
           </form>
         </Form>
       </DialogContent>
